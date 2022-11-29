@@ -34,3 +34,4 @@ TBD - after backtesting.
 
 `1b6c9e8` - Create docker-compose files. Create/Update
 
+`ebb1328` - Get Kimchi Premium backend from project kimchi or `cex-arb-back`
