@@ -17,6 +17,8 @@ To execute pip in virtual environment:  `venv/bin/pip`
 
 1. exec_pair_multi.py: process websocket data - runs for 24 hours TOPs
 2. exec_band.py: update band by five minutes. 
+3. ./kp-backend: **BACKEND CODE WRITTEN IN GO**. Backend for trading. Pubsub and websocket
+  - Originally from repo [cex-arb-back](https://github.com/SKKUGoon/cex-arb-back)
 
 Create separate docker file for both of them using docker compose
 
