@@ -40,3 +40,7 @@ TBD - after backtesting.
 
 `728a23c` - Docker compose file, and Dockerfile (service building purpose) configuration. Binance Band and Binance WS are depending on trade-control container
 
+`21ad1a5` - Creating trader class in python. - Websocket ability needed. 
+
+`9dc20ab` - BUGFIX:: Python does not use `websocket` module. Instead it uses `websocket-client` module. Installing both with `pip install` cause major errors.
+
