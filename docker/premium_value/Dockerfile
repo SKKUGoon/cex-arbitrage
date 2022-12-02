@@ -1,8 +1,8 @@
-FROM python:3.10.7-alpine
+FROM python:3.10.7
 
 WORKDIR /app
 
-RUN apk add --no-cache python3-dev libffi-dev gcc musl-dev make
+# RUN apk add --no-cache python3-dev libffi-dev gcc musl-dev make
 
 COPY requirements.txt .
 

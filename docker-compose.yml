@@ -1,14 +1,26 @@
-version: '3'
+version: '2'
 services:
+  trade_control:
+    build:
+      context: .
+      dockerfile: ./docker/premium_backend/Dockerfile
+    ports:
+      - "10532:10532"
   premium_band:
     build: 
       context: .
       dockerfile: ./docker/premium_band/Dockerfile
     ports: 
       - "8081:8081"
+    depends_on:
+      trade_control:
+        condition: service_healthy
   premium_value:
     build: 
       context: .
       dockerfile: ./docker/premium_value/Dockerfile
     ports:
       - "8082:8082"
+    depends_on:
+      trade_control:
+        condition: service_healthy
