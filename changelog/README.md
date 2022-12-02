@@ -34,4 +34,9 @@ TBD - after backtesting.
 
 `1b6c9e8` - Create docker-compose files. Create/Update
 
-`ebb1328` - Get Kimchi Premium backend from project kimchi or `cex-arb-back`
+`ebb1328` - Get Kimchi Premium backend from project kimchi or `cex-arb-back`. Attach it to main project
+
+`6b95e2f` - Create healthcheck endpoint for kp-backend. Dockercompose file healthcheck purpose.
+
+`728a23c` - Docker compose file, and Dockerfile (service building purpose) configuration. Binance Band and Binance WS are depending on trade-control container
+
