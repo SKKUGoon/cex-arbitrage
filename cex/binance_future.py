@@ -1,6 +1,6 @@
 from utility.coloring import PrettyColors
 from utility.parse_yaml import ConfigParse
-from .cex_factory import CexManagerX
+from .cex_factory import CexManagerX, CexManagerT
 
 from typing import Dict, List
 
@@ -70,3 +70,48 @@ class BinanceFutureX(CexManagerX):
         hist = list(map(lambda row: row[4], hist))
         
         return hist
+
+
+class BinanceFutureT(CexManagerT):
+    def __init__(self):
+        self.EX_ID = 'binance_future'
+
+        # Created by functions
+        self.config = self.parse_yaml()
+        self.conn = self.connection()
+    
+    def parse_yaml(self) -> Dict:
+        # Create self.config
+        print(PrettyColors.HEADR + "Binance Future Trader Config file" + PrettyColors.ENDC)
+        cp = ConfigParse("./binance.yaml")
+        d = cp.parse()
+        return {
+            'apiKey': d['info']['api-key'],
+            'secret': d['info']['api-pass'],
+            'options': {'defaultType': 'future'}
+        }
+    
+    def connection(self):
+        # Create self.conn
+        print(PrettyColors.HEADER + "Binance Future Connection" + PrettyColors.ENDC)
+        conn = ccxt.binance(config=self.config)
+        return conn
+
+    def balance(self):
+        print(PrettyColors.HEADER + "Binance Account Balance" + PrettyColors.ENDC)
+        
+        return super().balance()
+
+    def order_buy(self, buy: dict):
+        print(PrettyColors.HEADER + "Binance Order Buy Execute" + PrettyColors.ENDC)
+        return super().order_buy(buy)
+
+    def order_sell(self, sell: dict):
+        print(PrettyColors.HEADER + "Binance Order Sell Execute" + PrettyColors.ENDC)
+        return super().order_sell(sell)
+    
+    def trade_result(self):
+        print(PrettyColors.HEADER + "Binance Trade Result" + PrettyColors.ENDC) 
+        return super().trade_result()
+
+    

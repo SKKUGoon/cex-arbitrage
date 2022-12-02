@@ -25,6 +25,10 @@ class CexManagerX(ABC):
 
 class CexManagerT(ABC):
     @abstractmethod
+    def connection(self):
+        pass
+
+    @abstractmethod
     def balance(self):
         pass
 
@@ -65,6 +69,9 @@ class CexFactoryX:
         
 
 class CexFactoryT:
+    def get_connection(self, exchange: CexManagerX):
+        return exchange.connection()
+
     # Trader methods
     def get_balance(self, exchange: CexManagerT):
         return exchange.balance()
