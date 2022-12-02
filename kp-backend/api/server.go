@@ -1,9 +1,6 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
-	"gopkg.in/yaml.v3"
 	"kimchi/common"
 	"kimchi/dao"
 	"kimchi/ent"
@@ -11,6 +8,10 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
+	"gopkg.in/yaml.v3"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -39,6 +40,7 @@ func New() InternalServer {
 	conn.Use(common.CORSMiddleware())
 	common.PrintGreenOk("Create gin engine. Attach middleware")
 	conn.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	conn.GET("/ping", common.IsAlive)
 
 	caching := dao.CacheNewConn("./Redis.yaml")
 	common.PrintGreenOk("Create Redis connection for webserver")
