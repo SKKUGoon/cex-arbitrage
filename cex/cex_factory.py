@@ -29,7 +29,7 @@ class CexManagerT(ABC):
         pass
 
     @abstractmethod
-    def balance(self):
+    def balance(self, key_currency: str):
         pass
 
     @abstractmethod
@@ -42,6 +42,7 @@ class CexManagerT(ABC):
 
     @abstractmethod
     def order_tpsl(self, take_profit: float, stop_loss:float):
+        # TPSL: Take Profit Stop Loss
         pass
 
     @abstractmethod
