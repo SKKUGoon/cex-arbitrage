@@ -124,7 +124,7 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict, data_colle
                 )
             
 
-def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexManagerX, burst_interval_min: int=5):
+def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexManagerX, env: str="dev"):
     """
     @param exchange_long, exchange_short: Class type CexManagerX 
     @param burst_interval_min: Signal bursting request by minutes
@@ -132,8 +132,12 @@ def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexM
     print(PrettyColors.WARNING + "GEN_BAND_IEXA start" + PrettyColors.ENDC)
     cm = CexFactoryX()
     # Signal burst in seconds
-    BURST_TO: Final = "http://localhost:10532/band"
-    BURST_INTERVAL: Final = burst_interval_min * 60
+    if env.lower() == "dev":
+        BURST_TO = "http://localhost:10532/band"
+    elif env.lower() == "deploy":
+        BURST_TO = "http://0.0.0.0:10532/band"
+    else:
+        raise RuntimeError(f"Environment `{env}` is not one of the specified.")
     SPLIT_BY: Final = 5
     
     # Split tickers `tickers` by length of `5`
