@@ -6,6 +6,13 @@ services:
       dockerfile: ./docker/premium_backend/Dockerfile
     ports:
       - "10532:10532"
+    healthcheck:
+      test: curl --fail http://0.0.0.0:10532/ping || exit 1
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
   premium_band:
     build: 
       context: .
@@ -15,6 +22,7 @@ services:
     depends_on:
       trade_control:
         condition: service_healthy
+
   premium_value:
     build: 
       context: .

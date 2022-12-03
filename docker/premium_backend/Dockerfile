@@ -14,4 +14,4 @@ EXPOSE 10532
 
 # ENTRYPOINT [ "go" ]
 
-CMD [ "./kimchi" ]
+CMD [ "./kimchi", "-env=deploy" ]

@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 ENTRYPOINT [ "python" ]
-CMD [ "exec_pair_multi.py" ]
+CMD [ "exec_pair_multi.py", "-env=deploy", "-host=trade_control" ]
