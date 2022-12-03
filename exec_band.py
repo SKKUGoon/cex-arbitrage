@@ -10,8 +10,9 @@ import argparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    # -env ENVIRONMENT 
+    # -env ENVIRONMENT -host HOSTNAME
     parser.add_argument("-env", "--environment", help="Type of Environment, Dev or Deploy")
+    parser.add_argument("-host", "--hostname", help="Name of host. Service name such as trade_control")
 
     args = parser.parse_args()
 
@@ -29,6 +30,7 @@ if __name__ == "__main__":
         exchange_long=upbit_x,
         exchange_short=binance_x,
         env=args.environment,
+        hostname=args.hostname
     )
 
     
