@@ -44,3 +44,10 @@ TBD - after backtesting.
 
 `9dc20ab` - BUGFIX:: Python does not use `websocket` module. Instead it uses `websocket-client` module. Installing both with `pip install` cause major errors.
 
+`43c13aa` - Add deployment IP address - (0.0.0.0) so that it's accessible.
+
+`d234261`, `ec34061` `55108e5` - Add flag parse to employ deploy option. Add host name flag to specify docker container service name.
+
+`7f2e579` - Add deploy environment (docker service name etc) to premium comparison program `exec_pair_multi.py`
+
+`862a4f9` - Configure docker file. This includes container-wise networking and container healthcheck. Now executable. 
