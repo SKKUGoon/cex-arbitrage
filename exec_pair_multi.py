@@ -7,9 +7,18 @@ from sig.sig0 import StrategyIEXA
 from utility.graceful_shutdown import handle_ctrlc
 
 import signal
+import argparse
 
 
 if __name__ == "__main__":
+    # Parse flags for execution
+    parser = argparse.ArgumentParser()
+    # -env ENVIRONMENT -host HOSTNAME
+    parser.add_argument("-env", "--environment", help="Type of Environment, Dev or Deploy")
+    parser.add_argument("-host", "--hostname", help="Name of host. Service name such as trade_control")
+
+    args = parser.parse_args()
+
     cm = CexFactoryX()
     binance_x = BinanceFutureX()
     upbit_x = UpbitX()
@@ -27,4 +36,6 @@ if __name__ == "__main__":
         assets=a,
         ws_func_long=upbit_ws_multi,
         ws_func_short=binance_ws_multi,
+        env=args.environment,
+        hostname=args.hostname
     )

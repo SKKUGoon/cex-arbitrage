@@ -30,14 +30,22 @@ def gen_signal_iexa(q_long: mp.Queue, q_short: mp.Queue, data_collect: int=5):
             print("premium", premium)
 
 
-def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict, data_collect: int=30):
+def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict, 
+        env: str="dev", hostname: str="localhost", data_collect: int=120):
     """
     @param qs_long, qs_short: they look like as such. 
     { <asset name>: multiprocessing.Queue, ... }
     @param data_collect: how much time period between each premium calc burst.(secs)
     """
     print(PrettyColors.WARNING + "GEN_SIGNAL_IEXA_MULTI infinite loop start" + PrettyColors.ENDC)
-    SIGNAL_TO: Final = "http://localhost:10532/premium"
+    # Signal burst in seconds
+    if env.lower() == "dev":
+        SIGNAL_TO = f"http://{hostname}:10532/premium"
+    elif env.lower() == "deploy":
+        SIGNAL_TO = f"http://{hostname}:10532/premium"
+    else:
+        raise RuntimeError(f"Environment `{env}` is not one of the specified.")
+
     start = time.time()
     # Websocket packet handling endless cycle.
     # Stops after explicit ctrl + c key input
@@ -109,7 +117,7 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict, data_colle
                     print(PrettyColors.FAIL + f"Premium {a}: No Calc" + PrettyColors.ENDC)
         
         if collect:
-            resp = requests.post(SIGNAL_TO, json=packet, timeout=len(a)//2)
+            resp = requests.post(SIGNAL_TO, json=packet)
             if resp.status_code == 200:
                 print(
                     PrettyColors.OKGREEN 
@@ -124,7 +132,7 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict, data_colle
                 )
             
 
-def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexManagerX, env: str="dev"):
+def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexManagerX, env: str="dev", hostname: str="localhost"):
     """
     @param exchange_long, exchange_short: Class type CexManagerX 
     @param burst_interval_min: Signal bursting request by minutes
@@ -133,9 +141,9 @@ def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexM
     cm = CexFactoryX()
     # Signal burst in seconds
     if env.lower() == "dev":
-        BURST_TO = "http://localhost:10532/band"
+        BURST_TO = f"http://{hostname}:10532/band"
     elif env.lower() == "deploy":
-        BURST_TO = "http://0.0.0.0:10532/band"
+        BURST_TO = f"http://{hostname}:10532/band"
     else:
         raise RuntimeError(f"Environment `{env}` is not one of the specified.")
     SPLIT_BY: Final = 5

@@ -42,7 +42,8 @@ class StrategyIEXA:
         return result
     
     def run_multi(self, x_long: dict, x_short: dict, assets: set, 
-            ws_func_long: Callable, ws_func_short: Callable):
+            ws_func_long: Callable, ws_func_short: Callable, 
+            env: str="dev", hostname: str="localhost"):
         """
         @param x_long: dictionary that contains websocket subscription message 
           for Long-position only exchange (upbit)
@@ -67,7 +68,9 @@ class StrategyIEXA:
         
         p1 = mp.Process(target=ws_func_long, args=(x_long, multiq_long,))
         p2 = mp.Process(target=ws_func_short, args=(x_short, multiq_short,))
-        p3 = mp.Process(target=gen_signal_iexa_multi, args=(assets, multiq_long, multiq_short,))
+        p3 = mp.Process(target=gen_signal_iexa_multi, 
+          args=(assets, multiq_long, multiq_short, env, hostname)
+        )
 
         p1.start()
         p2.start()
