@@ -51,3 +51,5 @@ TBD - after backtesting.
 `7f2e579` - Add deploy environment (docker service name etc) to premium comparison program `exec_pair_multi.py`
 
 `862a4f9` - Configure docker file. This includes container-wise networking and container healthcheck. Now executable. 
+
+`03ef48b` - MODULE::TRADE:: Exchange balance search for trade prep.
