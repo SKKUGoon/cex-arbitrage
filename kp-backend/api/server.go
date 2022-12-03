@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -57,7 +58,7 @@ func (client InternalServer) AddUtil() InternalServer {
 	return client
 }
 
-func (client InternalServer) Serve(configFile string) *http.Server {
+func (client InternalServer) Serve(configFile string, configEnv string) *http.Server {
 	c := client.strategyIEXA()
 
 	webserverInfo := map[string]Webserver{}
@@ -69,14 +70,24 @@ func (client InternalServer) Serve(configFile string) *http.Server {
 	if err != nil {
 		log.Panicln("Webserver conn config file parse error:", err)
 	}
+
+	var webserverEnv string
+	switch strings.ToLower(configEnv) {
+	case "dev":
+		webserverEnv = "local-server"
+	case "deploy":
+		webserverEnv = "deploy-server"
+	}
+
 	// Internal webserver start information
 	src := &http.Server{
-		Addr:           webserverInfo["server"].Address + ":" + webserverInfo["server"].Port,
+		Addr:           webserverInfo[webserverEnv].Address + ":" + webserverInfo[webserverEnv].Port,
 		Handler:        c.Conn,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+	common.PrintBlueStatus("deploying on ", src.Addr)
 	return src
 }
 
