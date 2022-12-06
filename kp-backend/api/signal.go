@@ -3,10 +3,12 @@ package api
 import (
 	"context"
 	"errors"
-	"github.com/go-redis/redis/v8"
+	"fmt"
 	"kimchi/common"
 	"kimchi/dao"
 	"strconv"
+
+	"github.com/go-redis/redis/v8"
 )
 
 type Signal[T any] struct {
@@ -72,6 +74,20 @@ func comparePremium(p CurrentPremium, client *redis.Client) ([]Signal[Trade], er
 		thresLow, _ := strconv.ParseFloat(bandInfoLow[premium.Asset], 64)
 		thresUp, _ := strconv.ParseFloat(bandInfoUp[premium.Asset], 64)
 
+		if thresUp-thresLow < 0.005 {
+			// If the distance between band's upper threshold and lower threshold
+			// are so small, arbitrage might not be possible. Therefore, set a
+			// minumum threshold level and if the distance is not large enough
+			// return false(bool).
+			// Check if the threshold changes with the level of KP.
+			common.PrintPurpleWarning(
+				fmt.Sprintf(
+					"KP Bollinger band not large enough %v. No Profit anticipated. Passing",
+					thresUp-thresLow,
+				),
+			)
+			continue
+		}
 		var (
 			long  Signal[Trade]
 			short Signal[Trade]
