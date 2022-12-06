@@ -74,7 +74,7 @@ func comparePremium(p CurrentPremium, client *redis.Client) ([]Signal[Trade], er
 		thresLow, _ := strconv.ParseFloat(bandInfoLow[premium.Asset], 64)
 		thresUp, _ := strconv.ParseFloat(bandInfoUp[premium.Asset], 64)
 
-		if thresUp-thresLow < 0.005 {
+		if thresUp-thresLow < 1.5 {
 			// If the distance between band's upper threshold and lower threshold
 			// are so small, arbitrage might not be possible. Therefore, set a
 			// minumum threshold level and if the distance is not large enough
