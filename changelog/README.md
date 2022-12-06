@@ -53,3 +53,7 @@ TBD - after backtesting.
 `862a4f9` - Configure docker file. This includes container-wise networking and container healthcheck. Now executable. 
 
 `03ef48b` - MODULE::TRADE:: Exchange balance search for trade prep.
+
+`6f527f0` - Add key currency flag for both exchange. Python files. Change docker file accordingly
+
+`29bd8c4` `bc52e9e` - Process absolute band threshold distance guard(1.5%point), for ensured profit during arbitrage. 
