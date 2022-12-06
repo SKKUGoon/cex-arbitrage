@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 ENTRYPOINT [ "python" ]
-CMD [ "exec_band.py", "-env=deploy", "-host=trade_control" ]
+CMD [ "exec_band.py", "-env=deploy", "-host=trade_control", "-upbitkey=krw", "-binancekey=busd" ]

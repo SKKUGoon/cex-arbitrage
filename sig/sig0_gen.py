@@ -121,13 +121,13 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
             if resp.status_code == 200:
                 print(
                     PrettyColors.OKGREEN 
-                    + f"{resp.status_code} {resp.json()['data']['message']}"
+                    + f"Status Code{resp.status_code}: {resp.json()['data']['message']}"
                     + PrettyColors.ENDC
                 )
             else:
                 print(
                     PrettyColors.FAIL 
-                    + f"{resp.status_code} {resp.json()['data']['message']}"
+                    + f"Status Code{resp.status_code}: {resp.json()['data']['message']}"
                     + PrettyColors.ENDC
                 )
             

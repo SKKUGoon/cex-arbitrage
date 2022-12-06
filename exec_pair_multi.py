@@ -16,6 +16,8 @@ if __name__ == "__main__":
     # -env ENVIRONMENT -host HOSTNAME
     parser.add_argument("-env", "--environment", help="Type of Environment, Dev or Deploy")
     parser.add_argument("-host", "--hostname", help="Name of host. Service name such as trade_control")
+    parser.add_argument("-upbitkey", "--upbitkeycurrency", help="Upbit's key currency")
+    parser.add_argument("-binancekey", "--binancekeycurrency", help="Binance's key currency")
 
     args = parser.parse_args()
 
@@ -23,11 +25,14 @@ if __name__ == "__main__":
     binance_x = BinanceFutureX()
     upbit_x = UpbitX()
 
-    strat = StrategyIEXA(upbit_x, binance_x)
-    a = strat.target_assets('krw', 'usdt')
+    binance_key_currency = args.binancekeycurrency  # USDT or BUSD
+    upbit_key_currency = args.upbitkeycurrency  # KRW
 
-    u_a = cm.gen_ticker(upbit_x, a, 'krw')
-    b_a = cm.gen_ticker(binance_x, a, 'usdt')
+    strat = StrategyIEXA(upbit_x, binance_x)
+    a = strat.target_assets(upbit_key_currency, binance_key_currency)
+
+    u_a = cm.gen_ticker(upbit_x, a, upbit_key_currency)
+    b_a = cm.gen_ticker(binance_x, a, binance_key_currency)
 
     signal.signal(signal.SIGINT, handle_ctrlc)
     strat.run_multi(

@@ -13,17 +13,24 @@ if __name__ == "__main__":
     # -env ENVIRONMENT -host HOSTNAME
     parser.add_argument("-env", "--environment", help="Type of Environment, Dev or Deploy")
     parser.add_argument("-host", "--hostname", help="Name of host. Service name such as trade_control")
+    parser.add_argument("-upbitkey", "--upbitkeycurrency", help="Upbit's key currency")
+    parser.add_argument("-binancekey", "--binancekeycurrency", help="Binance's key currency")
 
     args = parser.parse_args()
 
     cm = CexFactoryX()
     binance_x = BinanceFutureX()
     upbit_x = UpbitX()
+
+    binance_key_currency = args.binancekeycurrency  # USDT or BUSD
+    upbit_key_currency = args.upbitkeycurrency  # KRW
+
+
     cm.get_connection(binance_x)
     cm.get_connection(upbit_x)
 
     strat = StrategyIEXA(upbit_x, binance_x)
-    a = strat.target_assets('krw', 'usdt')
+    a = strat.target_assets(upbit_key_currency, binance_key_currency)
     
     gen_band_iexa(
         a,
@@ -32,5 +39,3 @@ if __name__ == "__main__":
         env=args.environment,
         hostname=args.hostname
     )
-
-    
