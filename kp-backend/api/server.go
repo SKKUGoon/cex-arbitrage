@@ -36,14 +36,14 @@ type Webserver struct {
 //  3. Connect to Redis database
 //  4. TODO: connect to MySQL Database
 //  5. TODO: connect to Telegram Service
-func New() InternalServer {
+func New(redisConfig string) InternalServer {
 	conn := gin.Default()
 	conn.Use(common.CORSMiddleware())
 	common.PrintGreenOk("Create gin engine. Attach middleware")
 	conn.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	conn.GET("/ping", common.IsAlive)
 
-	caching := dao.CacheNewConn("./Redis.yaml")
+	caching := dao.CacheNewConn(redisConfig)
 	common.PrintGreenOk("Create Redis connection for webserver")
 
 	srv := InternalServer{

@@ -2,10 +2,12 @@ package dao
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
-	"gopkg.in/yaml.v3"
+	"kimchi/common"
 	"log"
 	"os"
+
+	"github.com/go-redis/redis/v8"
+	"gopkg.in/yaml.v3"
 )
 
 type redisLogin struct {
@@ -27,6 +29,8 @@ func CacheNewConn(configFile string) *redis.Client {
 		log.Panicln("Redis conn config file parse error:", err)
 	}
 
+	common.PrintBlueStatus(redisInfo["conn"].Host + ":" + redisInfo["conn"].Port)
+	common.PrintBlueStatus(redisInfo["login"].Password)
 	client := redis.NewClient(&redis.Options{
 		Addr:     redisInfo["conn"].Host + ":" + redisInfo["conn"].Port,
 		Password: redisInfo["login"].Password,

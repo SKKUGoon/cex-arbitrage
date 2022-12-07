@@ -15,11 +15,19 @@ func main() {
 	flag.Parse()
 
 	// Updater
-	ws2.TradePubSub = ws2.NewTradeReceiver("./Redis.yaml")
-	wsBase := api.New()
+	var updaterEnv string
+	switch *envPtr {
+	case "dev":
+		updaterEnv = "./Redis.yaml"
+	case "deploy":
+		updaterEnv = "./Redis_deploy.yaml"
+	}
+	ws2.TradePubSub = ws2.NewTradeReceiver(updaterEnv)
+	wsBase := api.New(updaterEnv)
 	go func() {
 		ws2.TradePubSub.Run()
 	}()
+
 	wsBase.Conn.GET("/ws", func(context *gin.Context) {
 		ws2.WebSocketHandler(context.Writer, context.Request)
 	})
