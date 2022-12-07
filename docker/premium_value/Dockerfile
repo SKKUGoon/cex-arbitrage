@@ -12,4 +12,5 @@ RUN pip install -r requirements.txt
 COPY . .
 
 ENTRYPOINT [ "python" ]
+# why do we use busd only? to ensure low transaction fee
 CMD [ "exec_pair_multi.py", "-env=deploy", "-host=trade_control", "-upbitkey=krw", "-binancekey=busd" ]
