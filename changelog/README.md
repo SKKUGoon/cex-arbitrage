@@ -61,3 +61,6 @@ TBD - after backtesting.
 `d6532e3` - Change binance key currency from USDT to BUSD. Save transaction cost.
 
 `84a1d64` - Change from redis cloud to redis local storage. Docker container. Check if do we need to open up external redis port?
+
+
+`82a5645` - git add trader
