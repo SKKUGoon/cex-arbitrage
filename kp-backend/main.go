@@ -3,10 +3,7 @@ package main
 import (
 	"flag"
 	"kimchi/api"
-	ws2 "kimchi/ws"
 	"log"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -22,15 +19,9 @@ func main() {
 	case "deploy":
 		updaterEnv = "./Redis_deploy.yaml"
 	}
-	ws2.TradePubSub = ws2.NewTradeReceiver(updaterEnv)
-	wsBase := api.New(updaterEnv)
-	go func() {
-		ws2.TradePubSub.Run()
-	}()
 
-	wsBase.Conn.GET("/ws", func(context *gin.Context) {
-		ws2.WebSocketHandler(context.Writer, context.Request)
-	})
+	wsBase := api.New(updaterEnv)
+
 	ws := wsBase.Serve("./Config.yaml", *envPtr)
 	log.Fatal(ws.ListenAndServe())
 }

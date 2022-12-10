@@ -95,7 +95,7 @@ func (client InternalServer) strategyIEXA() InternalServer {
 	client.Conn.POST("/band", func(context *gin.Context) {
 		handleBandP(context, client.CacheDataBase)
 	})
-	client.Conn.POST("/premium", func(context *gin.Context) {
+	client.Conn.GET("/premium", func(context *gin.Context) {
 		handlePremiumP(context, client.CacheDataBase)
 	})
 	return client

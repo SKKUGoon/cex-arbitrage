@@ -4,15 +4,25 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 	"kimchi/common"
 	"kimchi/dao"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 )
 
 // handleBandP
-// @Summary premium
+// @Summary Upload normal premium boundaries
+// @Description Compare duel traded crypto assets. (Traded both in upbit and binance)
+// @Description Kimchi Premium will have normal - rate of premiums.
+// @Description Upload the boundaries to Redis Database
+// @Accept json
+// @Produce json
+// @Router /band [post]
+// @Success 200 {object} Signal[StatusMessage]
+// @Failure 400 {object} Signal[StatusMessage]
+// @Failure 500 {object} Signal[StatusMessage]
 func handleBandP(c *gin.Context, client *redis.Client) {
 	// Process signal message
 	var sig Signal[[]Band]
@@ -53,6 +63,16 @@ func handleBandP(c *gin.Context, client *redis.Client) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// handlePremiumP
+// @Summary Compare current premium with normal premium boundaries
+// @Description Compare premium boundaries with current state of premium
+// @Description Kimchi Premium will have normal - rate of premiums.
+// @Description If it's below the normal boundaries, send out a trade signal via Redis PubSub.
+// @Accept json
+// @Produce json
+// @Router /premium [get]
+// @Success 200 {object} Signal[StatusMessage]
+// @Failure 500 {object} Signal[StatusMessage]
 func handlePremiumP(c *gin.Context, client *redis.Client) {
 	var sig Signal[CurrentPremium]
 	var resp Signal[StatusMessage]
@@ -73,7 +93,7 @@ func handlePremiumP(c *gin.Context, client *redis.Client) {
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-	// Publish message to Redis channel
+	// Publish message to Redis channel || Python Trader will read them
 	for _, tx := range txOrder {
 		txByte, err := json.Marshal(tx)
 		if err != nil {
