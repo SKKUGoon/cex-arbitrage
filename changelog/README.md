@@ -69,3 +69,4 @@ TBD - after backtesting.
 
 `f9e419a` - Delete unused functions. Single-websocket run etc.
 
+`cd00191` - Delete old testfiles (TODO: Reminder: Write testfiles later again)
