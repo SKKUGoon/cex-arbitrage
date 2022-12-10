@@ -1,8 +1,9 @@
 from utility.coloring import PrettyColors
 from utility.parse_yaml import ConfigParse
-from .cex_factory import CexManagerX, CexManagerT
+from .cex_factory import CexManagerX
+from .cex_factory_trade import CexManagerT
 
-from typing import Dict, Final
+from typing import Dict
 
 import ccxt
 

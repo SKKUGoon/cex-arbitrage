@@ -9,29 +9,8 @@ import requests
 import time
 
 
-def gen_signal_iexa(q_long: mp.Queue, q_short: mp.Queue, data_collect: int=5):
-    # Proof of concept
-    print(PrettyColors.WARNING + "GEN_SIGNAL_IEXA infinite loop start" + PrettyColors.ENDC)
-    start = time.time()
-
-    while True:
-        l = q_long.get(timeout=5)
-        s = q_short.get(timeout=5)
-
-        if time.time() - start >= data_collect:
-            fx_value, true_val = forex()
-            if not true_val:
-                print(PrettyColors.WARNING + "Foreign Exchange Rate, Approximated", PrettyColors.ENDC)
-
-            start = time.time()
-            premium = (
-                (l['orderbook_units'][0]['ask_price'] / fx_value) - float(s['b'])
-            ) / float(s['b'])
-            print("premium", premium)
-
-
 def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict, 
-        env: str="dev", hostname: str="localhost", data_collect: int=120):
+        env: str="dev", hostname: str="localhost", data_collect: int=30):
     """
     @param qs_long, qs_short: they look like as such. 
     { <asset name>: multiprocessing.Queue, ... }
@@ -117,17 +96,18 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
                     print(PrettyColors.FAIL + f"Premium {a}: No Calc" + PrettyColors.ENDC)
         
         if collect:
+            print(PrettyColors.BOLD + packet.__repr__() + PrettyColors.ENDC)
             resp = requests.post(SIGNAL_TO, json=packet)
             if resp.status_code == 200:
                 print(
                     PrettyColors.OKGREEN 
-                    + f"Status Code{resp.status_code}: {resp.json()['data']['message']}"
+                    + f"Status Code{resp.status_code}: {resp.json()}"
                     + PrettyColors.ENDC
                 )
             else:
                 print(
                     PrettyColors.FAIL 
-                    + f"Status Code{resp.status_code}: {resp.json()['data']['message']}"
+                    + f"Status Code{resp.status_code}: {resp.json()}"
                     + PrettyColors.ENDC
                 )
             

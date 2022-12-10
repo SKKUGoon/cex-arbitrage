@@ -1,7 +1,5 @@
 from cex.cex_factory import CexFactoryX, CexManagerX
-from cex.ws_binance import binance_ws
-from cex.ws_upbit import upbit_ws
-from .sig0_gen import gen_signal_iexa, gen_signal_iexa_multi
+from .sig0_gen import gen_signal_iexa_multi
 from utility.coloring import PrettyColors
 
 import multiprocessing as mp
@@ -43,6 +41,7 @@ class StrategyIEXA:
     
     def run_multi(self, x_long: dict, x_short: dict, assets: set, 
             ws_func_long: Callable, ws_func_short: Callable, 
+            ws_keycurr_long: str, ws_keycurr_short: str,
             env: str="dev", hostname: str="localhost"):
         """
         @param x_long: dictionary that contains websocket subscription message 
@@ -66,38 +65,17 @@ class StrategyIEXA:
             multiq_short[asset]: mp.Queue = mp.Queue()
         print(PrettyColors.OKBLUE + f"Created {len(assets)}# queues" + PrettyColors.ENDC)
         
-        p1 = mp.Process(target=ws_func_long, args=(x_long, multiq_long,))
-        p2 = mp.Process(target=ws_func_short, args=(x_short, multiq_short,))
-        p3 = mp.Process(target=gen_signal_iexa_multi, 
+        p1 = mp.Process(
+          target=ws_func_long, 
+          args=(x_long, multiq_long, ws_keycurr_long,))
+        p2 = mp.Process(
+          target=ws_func_short, 
+          args=(x_short, multiq_short, ws_keycurr_short,)
+        )
+        p3 = mp.Process(
+          target=gen_signal_iexa_multi, 
           args=(assets, multiq_long, multiq_short, env, hostname)
         )
-
-        p1.start()
-        p2.start()
-        p3.start()
-
-        p1.join()
-        p2.join()
-        p3.join()  # Wait for completion
-
-    def run(self):
-        """
-        There is an API request restriction in Binance API.
-        Since there are so many coin, we are going to use websocket.
-        Subscribe to currencies in asset_ls. This function will 
-        run forever until the ctrl+c is called. 
-
-        Subscribe to both exchange and it will store information 
-        inside a queue. The information will be processed each minute.
-
-        Must be run in __main__.
-        """
-        q_upbit: mp.Queue = mp.Queue()
-        q_binance: mp.Queue = mp.Queue()
-
-        p1 = mp.Process(target=upbit_ws, args=(q_upbit,))
-        p2 = mp.Process(target=binance_ws, args=(q_binance,))
-        p3 = mp.Process(target=gen_signal_iexa, args=(q_upbit, q_binance,))
 
         p1.start()
         p2.start()
