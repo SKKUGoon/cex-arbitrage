@@ -41,6 +41,8 @@ if __name__ == "__main__":
         assets=a,
         ws_func_long=upbit_ws_multi,
         ws_func_short=binance_ws_multi,
+        ws_keycurr_long=upbit_key_currency,
+        ws_keycurr_short=binance_key_currency,
         env=args.environment,
         hostname=args.hostname
     )

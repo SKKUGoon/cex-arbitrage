@@ -64,3 +64,8 @@ TBD - after backtesting.
 
 
 `82a5645` - git add trader
+
+`fff4c43` - Change trader alerting method from websocket to message queue. 
+
+`f9e419a` - Delete unused functions. Single-websocket run etc.
+
