@@ -4,14 +4,40 @@ from utility.bollinger import bollinger
 from utility.coloring import PrettyColors
 
 from typing import Final
-import multiprocessing as mp
-import requests
 import time
+import json
+
+import requests
+import redis
 
 
 def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict, 
         env: str="dev", hostname: str="localhost", data_collect: int=30):
     """
+    Infinite Loop. To be closed with `ctrl+c`. Data collecting after time ticker.
+
+    1) About foreign exchange rate
+        It calls for `forex()` value every `data_collect` seconds. 
+        `forex()` will return foreign exchange value. It is assumed that 1 USD will have equal amount of value to 1 USDT.
+    2) About Websocket data processing
+        It is to be inserted in a queue - waits for `timeout` seconds (default: 2).
+        Same goes for both exchanges. With the information of both exchanges, calculate
+        premium. If one of the queue is empty, the data cannot be calculated.
+
+        2-1) Try-except statement exist because we have to extract data from the queue
+        after timeout. 
+    3) About premium calculation
+        BAP: Best Asking price
+        BBP: Best Bidding price
+        premium = {(FX adjusted BAP) / BBP} - 1
+        All premium will be sent via redis pubsub as a json data drop packet. 
+
+        3-1) If premium is lower than certain threshold, the backend server will tell the 
+        trader channel to submit orders. The backend server will receive the premium 
+        information by `packet`. `packet` is a dictionary with `type`, `data`-
+        `exchangepair`, `data`-`asset_premium` as a key. 
+
+
     @param qs_long, qs_short: they look like as such. 
     { <asset name>: multiprocessing.Queue, ... }
     @param data_collect: how much time period between each premium calc burst.(secs)
@@ -19,31 +45,25 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
     print(PrettyColors.WARNING + "GEN_SIGNAL_IEXA_MULTI infinite loop start" + PrettyColors.ENDC)
     # Signal burst in seconds
     if env.lower() == "dev":
-        SIGNAL_TO = f"http://{hostname}:10532/premium"
+        r = redis.Redis(host=hostname, port=6379, db=0)
     elif env.lower() == "deploy":
-        SIGNAL_TO = f"http://{hostname}:10532/premium"
+        r = redis.Redis(host=hostname, port=6379, db=0, password="mypassword")
     else:
-        raise RuntimeError(f"Environment `{env}` is not one of the specified.")
+        raise RuntimeError(f"environment env={env} is not one of the specified")
 
     start = time.time()
-    # Websocket packet handling endless cycle.
-    # Stops after explicit ctrl + c key input
     while True:
-        # Data collecting time ticker.
-        # It calls for `forex()` value every `data_collect` seconds
-        #   `forex()` will return foreign exchange value. 
-        #   It is assumed that 1 USD will have equal amount of value to 1 USDT
         collect = time.time() - start >= data_collect
         if collect:
+            # Handle 1)
             fx_value, true_val = forex()
             if not true_val:
-                print(PrettyColors.WARNING + "Foreign Exchange Rate, Approximated", PrettyColors.ENDC)
+                print(
+                    PrettyColors.WARNING + 
+                    "Foreign Exchange Rate, Approximated" + 
+                    PrettyColors.ENDC
+                )
 
-        # From the set it process it waits for the websocket data
-        #   to be inserted in a queue. It waits for `timeout` amount
-        #   of 2 seconds. Same goes for both exchanges. With the information
-        #   of both exchanges, calculate premium.(if statement) If one of the 
-        #   queue is empty, the data cannot be calculated. (else statement)
         packet = {
             "type": "iexa",
             "data": {
@@ -51,11 +71,12 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
                     "long": "upbit",
                     "short": "binance"
                 },
-                "asset_premium": list()
+                "asset_premium": dict()
             }
         }
+        # Handle 2)
         for a in assets:
-            # Data extraction from queues
+            # Handle 2-1)
             try:
                 l = qs_long[a].get(timeout=2)
             except Exception as e:
@@ -66,50 +87,26 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
             except Exception as e:
                 print(PrettyColors.WARNING + f"Asset {a}:: data queue SHORT empty" + PrettyColors.ENDC)
                 s = None
+            if not collect:
+                continue
 
-            if collect:
-                # Why `if collect` after `try - except` on data extraction from queues
-                # We have to extract old information and use the information on time. 
-                start = time.time()
-                if l is not None and s is not None:
-                    # Premium is calculated as such
-                    #   Denote 1) Best Asking Price: BAP, 2) Best Biding price BBP
-                    # Calculations:
-                    #   (FX adjusted BAP / BBP) - 1
-                    #   If the calculation of premium is lower than certain threshold, 
-                    #     the backend server will tell the traders to submit orders.
-                    # This function will only <b>convey</b> the premium to the server.
-                    # The backend server will receive the premium information by `packet`
-                    #   `packet` is a dictionary with "type", "data"-"exchangepair", 
-                    #   "data"-"asset_premium" as a key. 
-                    premium = (
-                        (l['orderbook_units'][0]['ask_price'] / fx_value) - float(s['b'])
-                    ) / float(s['b'])
-                    packet["data"]["asset_premium"].append(
-                        {
-                            "asset": a,
-                            "premium": premium
-                        }
-                    )
-                    print(PrettyColors.OKGREEN + f"Premium {a} added" + PrettyColors.ENDC)
-                else:
-                    print(PrettyColors.FAIL + f"Premium {a}: No Calc" + PrettyColors.ENDC)
-        
-        if collect:
-            print(PrettyColors.BOLD + packet.__repr__() + PrettyColors.ENDC)
-            resp = requests.post(SIGNAL_TO, json=packet)
-            if resp.status_code == 200:
-                print(
-                    PrettyColors.OKGREEN 
-                    + f"Status Code{resp.status_code}: {resp.json()}"
-                    + PrettyColors.ENDC
-                )
+            if l is not None and s is not None:
+                # Handle 3)
+                premium = (
+                    (l['orderbook_units'][0]['ask_price'] / fx_value) - float(s['b'])
+                ) / float(s['b'])
+                packet["data"]["asset_premium"] = {
+                    "asset": a,
+                    "premium": premium,
+                }
+                # Handle 3-1)
+                packet_dump = json.dumps(packet)
+                r.publish(channel="trade_channel", message=packet_dump)
+                print(PrettyColors.OKGREEN + f"Premium {a} published" + PrettyColors.ENDC)
             else:
-                print(
-                    PrettyColors.FAIL 
-                    + f"Status Code{resp.status_code}: {resp.json()}"
-                    + PrettyColors.ENDC
-                )
+                print(PrettyColors.FAIL + f"Premium {a}: No Calc" + PrettyColors.ENDC)
+            # Reset time.
+            start = time.time()
             
 
 def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexManagerX, env: str="dev", hostname: str="localhost"):
