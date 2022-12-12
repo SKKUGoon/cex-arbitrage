@@ -70,3 +70,11 @@ TBD - after backtesting.
 `f9e419a` - Delete unused functions. Single-websocket run etc.
 
 `cd00191` - Delete old testfiles (TODO: Reminder: Write testfiles later again)
+
+`f854845` - BUGFIX: host name should be service
+
+`361ccde` - Refactor code: trade classes to *_trade.py files.
+
+`cbac6b7` - Refactor code: Delete all the unused functions. + Pubsub method added. Publish signal message to redis pubsub. Move client to top of the function
+
+`56f700b` - Example config file `exchange_example.yaml` added. 
