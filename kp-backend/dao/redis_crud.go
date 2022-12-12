@@ -2,19 +2,9 @@ package dao
 
 import (
 	"context"
+
 	"github.com/go-redis/redis/v8"
 )
-
-type RdbKeyFieldValue[T any] struct {
-	Key   string
-	Field string
-	Value T
-}
-
-type RdbKeyField struct {
-	Key   string
-	Field string
-}
 
 func RdbOpCreate[T any](r *redis.Client, ctx context.Context, value RdbKeyFieldValue[T]) error {
 	cmd := r.HSet(ctx, value.Key, value.Field, value.Value)

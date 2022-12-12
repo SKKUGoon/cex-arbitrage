@@ -10,13 +10,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type redisLogin struct {
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-}
-
 func CacheNewConn(configFile string) *redis.Client {
 	// configFile should be "../Redis.yaml"
 	redisInfo := map[string]redisLogin{}

@@ -1,14 +1,13 @@
 package dao
 
 import (
-	"context"
 	"fmt"
-	"github.com/go-redis/redis/v8"
 	"testing"
+
+	"github.com/go-redis/redis/v8"
 )
 
 var cl *redis.Client = CacheNewConn("../Redis.yaml")
-var ctx = context.Background()
 
 var testData = RdbKeyFieldValue[float64]{
 	Key:   "key:uuid",
@@ -22,7 +21,7 @@ var testKey = RdbKeyField{
 }
 
 func TestRdbOpCreate(t *testing.T) {
-	RdbOpCreate[float64](cl, ctx, testData)
+	RdbOpCreate(cl, ctx, testData)
 }
 
 func TestRdbOpRead(t *testing.T) {
