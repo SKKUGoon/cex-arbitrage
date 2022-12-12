@@ -51,5 +51,5 @@
 `d175302`
 > Summary: Redis message pubsub system. Publish Trading message, Subscribe to premium.
 
-`edc5bea`
+`edc5bea` `877ad07`
 > Summary: Remove premium "\[get\]" method. remove wss from webserver.
