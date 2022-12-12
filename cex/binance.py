@@ -18,11 +18,11 @@ class BinanceX(CexManagerX):
     def parse_yaml(self) -> Dict:
         # Create self.config
         print(PrettyColors.HEADER + "Binance Config file" + PrettyColors.ENDC)
-        cp = ConfigParse("./binance.yaml")
+        cp = ConfigParse("./exchange.yaml")
         d = cp.parse()
         return {
-            'apiKey': d['info']['api-key'], 
-            'secret': d['info']['api-pass']
+            'apiKey': d[self.EX_ID]['info']['api-key'], 
+            'secret': d[self.EX_ID]['info']['api-pass']
         }
 
     def connection(self):
