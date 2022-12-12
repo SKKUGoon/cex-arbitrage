@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"kimchi/common"
 	"kimchi/dao"
@@ -11,6 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 )
+
+type Signal[T any] struct {
+	Type string `json:"type" example:"iexa"`
+	Data T      `json:"data"`
+}
+
+type Band struct {
+	Asset string  `json:"asset" example:"BTC"`
+	Upper float64 `json:"upper" example:"3.42"`
+	Lower float64 `json:"lower" example:"0.56"`
+}
+
+type StatusMessage struct {
+	Message string `json:"message" example:"some message"`
+}
 
 // handleBandP
 // @Summary Upload normal premium boundaries
@@ -47,8 +61,8 @@ func handleBandP(c *gin.Context, client *redis.Client) {
 			Field: sig.Data[i].Asset,
 			Value: sig.Data[i].Lower,
 		}
-		err1 := dao.RdbOpCreate[float64](client, context.Background(), bandU)
-		err2 := dao.RdbOpCreate[float64](client, context.Background(), bandL)
+		err1 := dao.RdbOpCreate(client, context.Background(), bandU)
+		err2 := dao.RdbOpCreate(client, context.Background(), bandL)
 		if err1 != nil || err2 != nil {
 			common.PrintRedError("Band update error")
 			resp.Type = "failed"
@@ -60,56 +74,5 @@ func handleBandP(c *gin.Context, client *redis.Client) {
 	// Return Band Update successful
 	resp.Type = "success"
 	resp.Data.Message = "Band updated"
-	c.JSON(http.StatusOK, resp)
-}
-
-// handlePremiumP
-// @Summary Compare current premium with normal premium boundaries
-// @Description Compare premium boundaries with current state of premium
-// @Description Kimchi Premium will have normal - rate of premiums.
-// @Description If it's below the normal boundaries, send out a trade signal via Redis PubSub.
-// @Accept json
-// @Produce json
-// @Router /premium [get]
-// @Success 200 {object} Signal[StatusMessage]
-// @Failure 500 {object} Signal[StatusMessage]
-func handlePremiumP(c *gin.Context, client *redis.Client) {
-	var sig Signal[CurrentPremium]
-	var resp Signal[StatusMessage]
-
-	err := c.ShouldBindJSON(&sig)
-	if err != nil {
-		var resp Signal[StatusMessage]
-		resp.Type = "failed"
-		resp.Data.Message = err.Error()
-		c.JSON(http.StatusBadRequest, resp)
-		return
-	}
-
-	txOrder, err := comparePremium(sig.Data, client)
-	if err != nil {
-		resp.Type = "failed"
-		resp.Data.Message = err.Error()
-		c.JSON(http.StatusInternalServerError, resp)
-		return
-	}
-	// Publish message to Redis channel || Python Trader will read them
-	for _, tx := range txOrder {
-		txByte, err := json.Marshal(tx)
-		if err != nil {
-			common.PrintRedError(err.Error())
-			resp.Type = "publish failed"
-			resp.Data.Message = err.Error()
-			c.JSON(http.StatusInternalServerError, resp)
-			return
-		}
-		err = client.Publish(context.Background(), "trade_channel", txByte).Err()
-		if err != nil {
-			common.PrintRedError(err.Error())
-			continue
-		}
-	}
-	resp.Type = "success"
-	resp.Data.Message = "Premium successfully evaluated"
 	c.JSON(http.StatusOK, resp)
 }
