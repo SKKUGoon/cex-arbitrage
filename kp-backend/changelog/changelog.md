@@ -48,3 +48,8 @@
 > Summary: Process signal. Get premium - compare it with func, than relays premium 
 > redis pubsub. 
 
+`d175302`
+> Summary: Redis message pubsub system. Publish Trading message, Subscribe to premium.
+
+`edc5bea`
+> Summary: Remove premium "\[get\]" method. remove wss from webserver.

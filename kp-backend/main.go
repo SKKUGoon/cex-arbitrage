@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"kimchi/api"
+	"kimchi/dao"
 	"log"
 )
 
@@ -12,15 +13,20 @@ func main() {
 	flag.Parse()
 
 	// Updater
-	var updaterEnv string
+	var myEnv string
 	switch *envPtr {
 	case "dev":
-		updaterEnv = "./Redis.yaml"
+		myEnv = "./Redis.yaml"
 	case "deploy":
-		updaterEnv = "./Redis_deploy.yaml"
+		myEnv = "./Redis_deploy.yaml"
 	}
+	// PubSub
+	dao.SignalMQ = dao.NewSignalReciever(myEnv)
+	go func() {
+		dao.SignalMQ.Run()
+	}()
 
-	wsBase := api.New(updaterEnv)
+	wsBase := api.New(myEnv)
 
 	ws := wsBase.Serve("./Config.yaml", *envPtr)
 	log.Fatal(ws.ListenAndServe())
