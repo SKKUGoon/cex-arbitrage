@@ -1,0 +1,20 @@
+binance:
+  info:
+    api-key: binance_info_api_key
+    api-pass: binance_info_api_pass
+
+  trade:
+    api-key: binance_trade_api_key
+    api-pass: binance_trade_api_pass
+    created: binance_trade_created_date
+    expire: binance_trade_created_expire
+
+upbit:
+  info:
+    api-key: upbit_info_api_key
+    api-pass: upbit_info_api_pass
+
+rule:
+  maximum_leverage: 1
+  minimum_leverage: 1
+  
