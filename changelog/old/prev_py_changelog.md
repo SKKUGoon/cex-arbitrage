@@ -78,3 +78,9 @@ TBD - after backtesting.
 `cbac6b7` - Refactor code: Delete all the unused functions. + Pubsub method added. Publish signal message to redis pubsub. Move client to top of the function
 
 `56f700b` - Example config file `exchange_example.yaml` added. 
+
+`a2dae2c` - Add `flush=True` to all print in python script. `https://stackoverflow.com/questions/74811707/python-docker-container-not-running-simultaneously/74811891#74811891`
+
+`feb535c` - Build trader with `ccxt` package. 
+
+`a24582b` - Container restart process. 

@@ -53,3 +53,6 @@
 
 `edc5bea` `877ad07`
 > Summary: Remove premium "\[get\]" method. remove wss from webserver.
+
+`719b7ca`
+> Summary: Add visuals for current premium. 
