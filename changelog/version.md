@@ -8,9 +8,10 @@
 ### Main features
 CEx-Arbitrage model with IEXA(<b>I</b>nter <b>EX</b>change <b>A</b>rbitrage) strategy can be divided into three main parts. `trade-control` webserver, `trader`, and `signal-maker`. First is made out of Go, and second and third is made out of python. In addition, <b>Redis</b> container is needed to store temporary band data. 
 
-During the commits, it underwent a major design changes from using websockets to using message queue to deliver internal messages. ( [fff4c43](https://github.com/SKKUGoon/cex-arbitrage/commit/fff4c4300044af1586b6b1d12fc6e69601565045) )
+During the commits, it underwent a major design changes from using websockets to using message queue to deliver internal messages. ( [fff4c43](https://github.com/SKKUGoon/cex-arbitrage/commit/fff4c4300044af1586b6b1d12fc6e69601565045) ). Now new `changelog` logging style is being implemented. Starting from ( [123325b]() ). 
 
-- <b>Redis</b> Database. Changed from cloud to redis local storage inside docker container( [84a1d64](https://github.com/SKKUGoon/cex-arbitrage/commit/84a1d641343017b7c24edd0920f9e758bd473bd5) )
+- <b>Redis</b> Database. 
+  - Changed from cloud to redis local storage inside docker container( [84a1d64](https://github.com/SKKUGoon/cex-arbitrage/commit/84a1d641343017b7c24edd0920f9e758bd473bd5) )
 
 - `trade-control` features
   - Previously named Kimchi-Premium-Backend, or cex-arb-back, it is now attached to the main project. ( [ebb1328](https://github.com/SKKUGoon/cex-arbitrage/commit/ebb13281e464a8b9200c2d46d83e99e3fb3253d5) )
