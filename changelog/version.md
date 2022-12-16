@@ -16,7 +16,7 @@ During the commits, it underwent a major design changes from using websockets to
 - `trade-control` features
   - Previously named Kimchi-Premium-Backend, or cex-arb-back, it is now attached to the main project. ( [ebb1328](https://github.com/SKKUGoon/cex-arbitrage/commit/ebb13281e464a8b9200c2d46d83e99e3fb3253d5) )
   - Add absoulte trading barrier of difference_premium > 1.5%point. This ensures the profitability of trade. ( [29bd8c4](https://github.com/SKKUGoon/cex-arbitrage/commit/29bd8c4f8d6fe1c89064f55e5c330a9254622690), [bc52e9e](https://github.com/SKKUGoon/cex-arbitrage/commit/bc52e9ec5903e3178c5eba01493a6571bee4c51f) )
-  - Snippts of backend changelog can be found here. 
+  - Snippts of backend changelog can be found here. [cex-arb-back](https://github.com/SKKUGoon/cex-arb-back)
 
 - `signal-maker` features
   - `[exchangename]X` styled class factory - for non trade functions. ( [a1b2865](https://github.com/SKKUGoon/cex-arbitrage/commit/a1b286549cda4b2021907c365addb39f4da6a46c) )
