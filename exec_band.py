@@ -1,6 +1,7 @@
 from cex.cex_factory import CexFactoryX
 from cex.binance_future import BinanceFutureX
 from cex.domestic import UpbitX
+from utility.coloring import PrettyColors
 from sig.sig0 import StrategyIEXA
 from sig.sig0_gen import gen_band_iexa
 
@@ -17,6 +18,9 @@ if __name__ == "__main__":
     parser.add_argument("-binancekey", "--binancekeycurrency", help="Binance's key currency")
 
     args = parser.parse_args()
+    
+    INTERVAL = 60 * 5  # secs
+    job_start = time.time()
 
     cm = CexFactoryX()
     binance_x = BinanceFutureX()
@@ -39,3 +43,12 @@ if __name__ == "__main__":
         env=args.environment,
         hostname=args.hostname
     )
+    job_done = time.time()
+    print(
+        PrettyColors.WARNING
+        + f"Band Updated. {time.strftime('%c', time.localtime())}\n"
+        + f"Container sleeping for {int(job_start-job_done)}secs before restarting"
+        + PrettyColors.ENDC,
+        flush=True
+    )
+    time.sleep(job_start-job_done)

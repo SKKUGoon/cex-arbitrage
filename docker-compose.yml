@@ -33,6 +33,7 @@ services:
     depends_on:
       trade_control:
         condition: service_healthy
+    restart: unless-stopped
 
   premium_value:
     build: 
@@ -40,6 +41,16 @@ services:
       dockerfile: ./docker/premium_value/Dockerfile
     ports:
       - "8082:8082"
+    depends_on:
+      trade_control:
+        condition: service_healthy
+
+  premium_trade:
+    build:
+      context: .
+      dockerfile: ./docker/premium_trade/Dockerfile
+    ports:
+      - "8083:8083"
     depends_on:
       trade_control:
         condition: service_healthy
