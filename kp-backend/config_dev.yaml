@@ -1,0 +1,19 @@
+local-server:
+  address: 127.0.0.1
+  port: 10532
+
+redis:
+  login:
+    user: default
+    password: mi67fpuEc64dlv2Vx6n3UQjWC5bMi9BL
+  conn:
+    host: redis-15214.c73.us-east-1-2.ec2.cloud.redislabs.com
+    port: 15214
+  pubsub:
+    tradechannel: trade_channel
+    signalchannel: signal_channel
+  
+telegram:
+  BotName: CexArb
+  BotUsername: CexArbBot
+  Token: 5754254968:AAFbcylgh5dz6tPJkOKX058_gcHll3h8NSY

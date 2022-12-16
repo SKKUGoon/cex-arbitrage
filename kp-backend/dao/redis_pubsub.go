@@ -73,8 +73,8 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) ([]Signal[
 	if math.Abs(thresUp-thresLow) < MINIMUM_BOUND_LENGTH {
 		common.PrintPurpleWarning(
 			fmt.Sprintf(
-				"KP Bollinger band not large enough %v. No Profit anticipated. Passing",
-				thresUp-thresLow,
+				"KP Bollinger band not large enough %v for %s. No Profit anticipated. Passing",
+				thresUp-thresLow, p.AssetPremium.Asset,
 			),
 		)
 		return []Signal[Trade]{}, false
@@ -107,6 +107,13 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) ([]Signal[
 		short.Data.Position = "long"
 		short.Data.Asset = p.AssetPremium.Asset
 	default:
+		common.PrintBlueStatus(
+			fmt.Sprintf(
+				"Asset %s || (low) %v < %v < %v (up) || No Trade",
+				p.AssetPremium.Asset,
+				thresLow, p.AssetPremium.Premium, thresUp,
+			),
+		)
 		return []Signal[Trade]{}, false
 	}
 	return []Signal[Trade]{long, short}, true
@@ -114,10 +121,6 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) ([]Signal[
 
 func (mq *SignalMessageQueue) broadcastSignal(msg []byte) {
 	mq.SignalMessage <- msg
-}
-
-func (mq *SignalMessageQueue) broadcastTrade(msg []byte) {
-	mq.TradeMessage <- msg
 }
 
 // mqHandler *SignalMessageQueue
@@ -128,7 +131,7 @@ func (mq *SignalMessageQueue) mqHandler() {
 	// Initial Band information
 	var bandUpper map[string]string
 	var bandLower map[string]string
-	var p CurrentPremium
+	var p Signal[CurrentPremium]
 	bandUpper, err1 := getBandInfo("upper", mq.client)
 	bandLower, err2 := getBandInfo("lower", mq.client)
 	if err1 != nil || err2 != nil {
@@ -142,21 +145,15 @@ func (mq *SignalMessageQueue) mqHandler() {
 			// Compare signal with band
 			// Send out Trade message
 			_ = json.Unmarshal(sigM, &p)
-			tradeSigs, ok := comparePremium(p, bandUpper, bandLower)
+			tradeSigs, ok := comparePremium(p.Data, bandUpper, bandLower)
 			if ok {
 				for _, trade := range tradeSigs {
-					err := mq.client.Publish(ctx, "trade_channel", trade).Err()
+					tradePacket, _ := json.Marshal(trade)
+					err := mq.client.Publish(ctx, "trade_channel", tradePacket).Err()
 					if err != nil {
 						common.PrintPurpleWarning(err.Error())
 						continue
 					}
-
-					messagePacket, err := json.Marshal(trade)
-					if err != nil {
-						common.PrintPurpleWarning(err.Error())
-						continue
-					}
-					mq.broadcastTrade(messagePacket)
 				}
 			}
 			continue
@@ -176,7 +173,7 @@ func (mq *SignalMessageQueue) mqHandler() {
 // Goroutine mqHandler. Plus insert message using `broadcastSignal` method.
 func (mq *SignalMessageQueue) Run() error {
 	go mq.mqHandler()
-	subscriber := mq.client.Subscribe(ctx, "trade_channel")
+	subscriber := mq.client.Subscribe(ctx, "signal_channel")
 	for {
 		msg, err := subscriber.ReceiveMessage(ctx)
 		if err != nil {
