@@ -8,7 +8,7 @@
 ### Main features
 CEx-Arbitrage model with IEXA(<b>I</b>nter <b>EX</b>change <b>A</b>rbitrage) strategy can be divided into three main parts. `trade-control` webserver, `trader`, and `signal-maker`. First is made out of Go, and second and third is made out of python. In addition, <b>Redis</b> container is needed to store temporary band data. 
 
-During the commits, it underwent a major design changes from using websockets to using message queue to deliver internal messages. ( [fff4c43](https://github.com/SKKUGoon/cex-arbitrage/commit/fff4c4300044af1586b6b1d12fc6e69601565045) ). Now new `changelog` logging style is being implemented. Starting from ( [123325b]() ). 
+During the commits, it underwent a major design changes from using websockets to using message queue to deliver internal messages. ( [fff4c43](https://github.com/SKKUGoon/cex-arbitrage/commit/fff4c4300044af1586b6b1d12fc6e69601565045) ). Now new `changelog` logging style is being implemented. Starting from ( [123325b](https://github.com/SKKUGoon/cex-arbitrage/commit/123325b81705bf37c6455ae4aa2e69f967323835) ). 
 
 - <b>Redis</b> Database. 
   - Changed from cloud to redis local storage inside docker container( [84a1d64](https://github.com/SKKUGoon/cex-arbitrage/commit/84a1d641343017b7c24edd0920f9e758bd473bd5) )
@@ -21,7 +21,7 @@ During the commits, it underwent a major design changes from using websockets to
 - `signal-maker` features
   - `[exchangename]X` styled class factory - for non trade functions. ( [a1b2865](https://github.com/SKKUGoon/cex-arbitrage/commit/a1b286549cda4b2021907c365addb39f4da6a46c) )
   - Trade signal generator. Previously in the form of `http` request, but now in the form of Publish to <b>Redis</b>. ( [ba0af78](https://github.com/SKKUGoon/cex-arbitrage/commit/ba0af78d8078bb8c9f50e50d088a7befbe7fe80a) )
-  - Container restart process ( [a24582b]() )
+  - Container restart process ( [a24582b](https://github.com/SKKUGoon/cex-arbitrage/commit/a24582b4a6e9f68f3eaee143bc3ef39356059713) )
 
 - `trader` features
   - Trader classes are built with class factory styled. ( [21ad1a5](https://github.com/SKKUGoon/cex-arbitrage/commit/21ad1a5256f527b8efb5959e30ec9726ece3436e), [82a5645](https://github.com/SKKUGoon/cex-arbitrage/commit/82a56450cd179a248f710cc0e3dcd12236176add) )
