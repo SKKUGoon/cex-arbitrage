@@ -17,8 +17,13 @@ class BinanceFutureT(CexManagerT):
     
     def parse_yaml(self) -> Dict:
         # Create self.config
-        print(PrettyColors.HEADER + "Binance Future Trader Config file" + PrettyColors.ENDC)
-        cp = ConfigParse("./binance.yaml")
+        print(
+            PrettyColors.HEADER 
+            + "Binance Future Trader Config file" 
+            + PrettyColors.ENDC, 
+            flush=True
+        )
+        cp = ConfigParse("./exchange.yaml")
         d = cp.parse()
         return {
             'apiKey': d[self.EX_ID]['info']['api-key'],
@@ -28,7 +33,12 @@ class BinanceFutureT(CexManagerT):
     
     def connection(self):
         # Create self.conn
-        print(PrettyColors.HEADER + "Binance Future Connection" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Binance Future Trader Connection" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         conn = ccxt.binance(config=self.config)
         return conn
 
@@ -40,7 +50,12 @@ class BinanceFutureT(CexManagerT):
         return opened
         
     def balance(self, key_currency: str="USDT") -> Dict:
-        print(PrettyColors.HEADER + "Binance Future Account Balance" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Binance Future Account Balance" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         # balance: { 
         #   'asset': 'USDT', 
         #   'balance': { 
@@ -62,19 +77,39 @@ class BinanceFutureT(CexManagerT):
         }
 
     def order_buy(self, buy: dict):
-        print(PrettyColors.HEADER + "Binance Future Order Buy Execute" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Binance Future Order Buy Execute" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         # self.conn.create_order()
         return 
 
     def order_sell(self, sell: dict):
-        print(PrettyColors.HEADER + "Binance Future Order Sell Execute" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Binance Future Order Sell Execute" 
+            + PrettyColors.ENDC,
+            flush=True,
+        )
         # self.conn.create_order()
         return 
     
     def order_tpsl(self, take_profit: float, stop_loss: float):
-        print(PrettyColors.HEADER + "Binance Future TakeProfit StopLoss Order" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Binance Future TakeProfit StopLoss Order" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         return 
     
     def trade_result(self):
-        print(PrettyColors.HEADER + "Binance Future Trade Result" + PrettyColors.ENDC) 
+        print(
+            PrettyColors.HEADER 
+            + "Binance Future Trade Result" 
+            + PrettyColors.ENDC,
+            flush=True
+        ) 
         return 

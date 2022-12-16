@@ -1,24 +1,32 @@
+from cex.cex_factory_trade import CexManagerT, CexFactoryT
 import redis
 
-r = redis.Redis(host="localhost", port=6379, db=0)
-s = r.pubsub()
 
-s.subscribe("channel_name")
+class ArbitrageIEXA:
+    """
+    Inter Exchange Arbitrage Strategy
+    In this case,
+      exchange_long: upbit
+      exchange_short: binance
+    """
+    def __init__(self, exchange_long: CexManagerT, exchange_short: CexManagerT, hostname: str):
+        self.exchange = CexFactoryT()
+        self.long = exchange_long
+        self.short = exchange_short
 
-while True:
-    break
+        r = redis.Redis(host=hostname, port=6379, db=0, password="mypassword")
+        self.pubsub = r.pubsub()
 
+    def listen(self, channel_name: str):
+        self.pubsub.subscribe(channel_name)
 
-class Arbitrage: 
-    def __init__(self):
-        self.r = redis.Redis(host="localhost")
-        self.topic: str = None
-
-    def __conn__(self):
+        while True:            
+            print('waiting for trading message')
+            res = self.pubsub.get_message(timeout=5)
+            if res is not None:
+                print(f"message: {res}", flush=True)
         ...
 
-    def setup(self, value: str):
-        self.topic = value
+
+
     
-    async def handle_message(self):
-        ...

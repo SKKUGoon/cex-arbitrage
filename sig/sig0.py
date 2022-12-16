@@ -74,7 +74,7 @@ class StrategyIEXA:
         )
         p3 = mp.Process(
           target=gen_signal_iexa_multi, 
-          args=(assets, multiq_long, multiq_short, env, hostname)
+          args=(assets, multiq_long, multiq_short, hostname, env,)
         )
 
         p1.start()

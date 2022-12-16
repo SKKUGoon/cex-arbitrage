@@ -16,7 +16,12 @@ def upbit_ws_multi(watch_ls: dict, q_dict: dict, key_currency: str):
         """
         @param ticker_subject: example {}
         """
-        print(PrettyColors.OKBLUE + "upbit websocket subscription message generated" + PrettyColors.ENDC)
+        print(
+            PrettyColors.OKBLUE 
+            + "upbit websocket subscription message generated" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         sub_key = list(ticker_subject.keys())[0]
         sub = [
             {"ticket": str(uuid.uuid4())[:6]},
@@ -29,7 +34,12 @@ def upbit_ws_multi(watch_ls: dict, q_dict: dict, key_currency: str):
         return sub
 
     def on_open(ws):
-        print(PrettyColors.UNDERLINE + "upbit opened" + PrettyColors.ENDC)
+        print(
+            PrettyColors.UNDERLINE 
+            + "upbit opened" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         sub_msg = subscription(watch_ls)
         ws.send(json.dumps(sub_msg))
     
@@ -42,7 +52,12 @@ def upbit_ws_multi(watch_ls: dict, q_dict: dict, key_currency: str):
         print(msg)
 
     def on_close(ws):
-        print(PrettyColors.UNDERLINE + "upbit closed" + PrettyColors.ENDC)
+        print(
+            PrettyColors.UNDERLINE 
+            + "upbit closed" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
     
     ws = websocket.WebSocketApp(
         endpoint_url,

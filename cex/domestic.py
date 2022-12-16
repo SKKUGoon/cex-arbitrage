@@ -17,7 +17,12 @@ class UpbitX(CexManagerX):
 
     def parse_yaml(self) -> Dict:
         # Create self.config
-        print(PrettyColors.HEADER + "Upbit Config file" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Config file" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         cp = ConfigParse('./exchange.yaml')
         d = cp.parse()
         return {
@@ -27,7 +32,12 @@ class UpbitX(CexManagerX):
 
     def connection(self):
         # Create self.conn
-        print(PrettyColors.HEADER + "Upbit Connection" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Connection" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         conn = ccxt.upbit(config=self.config)
         return conn
 
@@ -46,7 +56,12 @@ class UpbitX(CexManagerX):
 
     def tradable(self):
         # Create self.curr
-        print(PrettyColors.OKCYAN + "Upbit Tradables Update" + PrettyColors.ENDC)
+        print(
+            PrettyColors.OKCYAN 
+            + "Upbit Tradables Update" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         curr = self.conn.load_markets()
         key_curr_pair = self._key_currency(curr)
         return key_curr_pair

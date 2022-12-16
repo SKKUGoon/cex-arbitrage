@@ -12,7 +12,7 @@ import redis
 
 
 def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict, 
-        env: str="dev", hostname: str="localhost", data_collect: int=30):
+        hostname: str, env: str="dev", data_collect: int=30):
     """
     Infinite Loop. To be closed with `ctrl+c`. Data collecting after time ticker.
 
@@ -42,7 +42,12 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
     { <asset name>: multiprocessing.Queue, ... }
     @param data_collect: how much time period between each premium calc burst.(secs)
     """
-    print(PrettyColors.WARNING + "GEN_SIGNAL_IEXA_MULTI infinite loop start" + PrettyColors.ENDC)
+    print(
+        PrettyColors.WARNING 
+        + "GEN_SIGNAL_IEXA_MULTI infinite loop start" 
+        + PrettyColors.ENDC,
+        flush=True
+    )
     # Signal burst in seconds
     if env.lower() == "dev":
         r = redis.Redis(host=hostname, port=6379, db=0)
@@ -60,12 +65,14 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
             if not true_val:
                 print(
                     PrettyColors.WARNING + 
-                    "Foreign Exchange Rate, Approximated" + 
-                    PrettyColors.ENDC
+                        "Foreign Exchange Rate, Approximated" + 
+                        PrettyColors.ENDC,
+                    flush=True
                 )
 
         packet = {
             "type": "iexa",
+            "status": True,
             "data": {
                 "exchange_pair": {
                     "long": "upbit",
@@ -80,12 +87,22 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
             try:
                 l = qs_long[a].get(timeout=2)
             except Exception as e:
-                print(PrettyColors.WARNING + f"Asset {a}:: data queue LONG empty" + PrettyColors.ENDC)
+                print(
+                    PrettyColors.WARNING 
+                    + f"Asset {a}:: data queue LONG empty" 
+                    + PrettyColors.ENDC,
+                    flush=True
+                )
                 l = None
             try :
                 s = qs_short[a].get(timeout=2)
             except Exception as e:
-                print(PrettyColors.WARNING + f"Asset {a}:: data queue SHORT empty" + PrettyColors.ENDC)
+                print(
+                    PrettyColors.WARNING 
+                    + f"Asset {a}:: data queue SHORT empty" 
+                    + PrettyColors.ENDC,
+                    flush=True
+                )
                 s = None
             if not collect:
                 continue
@@ -101,10 +118,20 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
                 }
                 # Handle 3-1)
                 packet_dump = json.dumps(packet)
-                r.publish(channel="trade_channel", message=packet_dump)
-                print(PrettyColors.OKGREEN + f"Premium {a} published" + PrettyColors.ENDC)
+                r.publish(channel="signal_channel", message=packet_dump)
+                print(
+                    PrettyColors.OKGREEN 
+                    + f"Premium {a} published" 
+                    + PrettyColors.ENDC,
+                    flush=True
+                )
             else:
-                print(PrettyColors.FAIL + f"Premium {a}: No Calc" + PrettyColors.ENDC)
+                print(
+                    PrettyColors.FAIL 
+                    + f"Premium {a}: No Calc" 
+                    + PrettyColors.ENDC,
+                    flush=True
+                )
             # Reset time.
             start = time.time()
             
@@ -114,7 +141,10 @@ def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexM
     @param exchange_long, exchange_short: Class type CexManagerX 
     @param burst_interval_min: Signal bursting request by minutes
     """
-    print(PrettyColors.WARNING + "GEN_BAND_IEXA start" + PrettyColors.ENDC)
+    print(
+        PrettyColors.WARNING + "GEN_BAND_IEXA start" + PrettyColors.ENDC,
+        flush=True
+    )
     cm = CexFactoryX()
     # Signal burst in seconds
     if env.lower() == "dev":
@@ -166,16 +196,23 @@ def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexM
             print(
                 PrettyColors.OKGREEN 
                 + f"{resp.json()['type']} {resp.json()['data']['message']}"
-                + PrettyColors.ENDC
+                + PrettyColors.ENDC,
+                flush=True
             )
         else:
             print(
                 PrettyColors.FAIL 
                 + f"{resp.status_code} {resp.json()['data']['message']}"
-                + PrettyColors.ENDC
+                + PrettyColors.ENDC,
+                flush=True
             )
         print(post_premium_data)
     # End of update
-    print(PrettyColors.WARNING + "GEN_BAND_IEXA end" + PrettyColors.ENDC)
+    print(
+        PrettyColors.WARNING 
+        + "GEN_BAND_IEXA end" 
+        + PrettyColors.ENDC,
+        flush=True
+    )
         
         

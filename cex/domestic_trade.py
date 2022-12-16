@@ -17,8 +17,13 @@ class UpbitT(CexManagerT):
 
     def parse_yaml(self) -> Dict:
         # Create self.config
-        print(PrettyColors.HEADER + "Upbit Config file" + PrettyColors.ENDC)
-        cp = ConfigParse('./upbit.yaml')
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Config file" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
+        cp = ConfigParse("./exchange.yaml")
         d = cp.parse()
         return {
             'apiKey': d[self.EX_ID]['info']['api-key'], 
@@ -27,12 +32,22 @@ class UpbitT(CexManagerT):
 
     def connection(self):
         # Create self.conn
-        print(PrettyColors.HEADER + "Upbit Connection" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Trader Connection" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         conn = ccxt.upbit(config=self.config)
         return conn
 
     def balance(self, key_currency: str="KRW") -> Dict:
-        print(PrettyColors.HEADER + "Upbit Account Balance" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Account Balance" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         b = self.conn.fetch_balance()
         # Upbit is a currency exchange.
         # Not explicitly a position        
@@ -45,17 +60,37 @@ class UpbitT(CexManagerT):
         }
 
     def order_buy(self, buy: dict):
-        print(PrettyColors.HEADER + "Upbit Order Buy Execute" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Order Buy Execute" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         return 
 
     def order_sell(self, sell: dict):
-        print(PrettyColors.HEADER + "Upbit Order Sell Execute" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Order Sell Execute" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         return 
 
     def order_tpsl(self, take_profit: float, stop_loss: float):
-        print(PrettyColors.HEADER + "Upbit Order TakeProfit StopLoss Execute" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Order TakeProfit StopLoss Execute"
+            + PrettyColors.ENDC,
+            flush=True
+        )
         return 
 
     def trade_result(self):
-        print(PrettyColors.HEADER + "Upbit Future Trade Result" + PrettyColors.ENDC)
+        print(
+            PrettyColors.HEADER 
+            + "Upbit Future Trade Result" 
+            + PrettyColors.ENDC,
+            flush=True
+        )
         return
