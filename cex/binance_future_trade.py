@@ -8,8 +8,9 @@ import ccxt
 
 
 class BinanceFutureT(CexManagerT):
-    def __init__(self):
+    def __init__(self, key_currency: str):
         self.EX_ID = 'binance'
+        self.EX_CURRENCY = key_currency.upper()
 
         # Created by functions
         self.config = self.parse_yaml()
@@ -42,44 +43,35 @@ class BinanceFutureT(CexManagerT):
         conn = ccxt.binance(config=self.config)
         return conn
 
-    def open_position(self, total_position: list) -> List:
+    def _open_position(self, total_position: list) -> List:
         opened = list()
         for p in total_position:
             if float(p['positionAmt']) != 0:
                 opened.append(p)
         return opened
         
-    def balance(self, key_currency: str="USDT") -> Dict:
+    def balance(self, key_currency: str) -> Dict:
         print(
             PrettyColors.HEADER 
             + "Binance Future Account Balance" 
             + PrettyColors.ENDC,
             flush=True
         )
-        # balance: { 
-        #   'asset': 'USDT', 
-        #   'balance': { 
-        #       'free': ..., 
-        #       'used': ..., 
-        #       'total': ..., 
-        #   } 
-        # },
-        # open_position: [
-        #   { open position infos ... },
-        # ]
+        # balance: {... 'balance': {'free': ..., 'used': ..., 'total': ...,}} 
+        # open_position: [{ open position infos ... }]
         b = self.conn.fetch_balance()
         return {
             'key_balance': {
                 'asset': key_currency,
                 'balance': b[key_currency],
             },
-            'open_position': self.open_position(b['info']['positions']),
+            'open_position': self._open_position(b['info']['positions']),
         }
 
     def order_buy(self, buy: dict):
         print(
             PrettyColors.HEADER 
-            + "Binance Future Order Buy Execute" 
+            + "Binance Future Order Buy Process" 
             + PrettyColors.ENDC,
             flush=True
         )
@@ -89,21 +81,12 @@ class BinanceFutureT(CexManagerT):
     def order_sell(self, sell: dict):
         print(
             PrettyColors.HEADER 
-            + "Binance Future Order Sell Execute" 
+            + "Binance Future Order Sell Process" 
             + PrettyColors.ENDC,
             flush=True,
         )
         # self.conn.create_order()
-        return 
-    
-    def order_tpsl(self, take_profit: float, stop_loss: float):
-        print(
-            PrettyColors.HEADER 
-            + "Binance Future TakeProfit StopLoss Order" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
-        return 
+        return
     
     def trade_result(self):
         print(

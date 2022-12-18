@@ -8,8 +8,9 @@ import ccxt
 
 
 class UpbitT(CexManagerT):
-    def __init__(self) -> None:
+    def __init__(self, key_currency: str):
         self.EX_ID = 'upbit'
+        self.EX_CURRENCY = key_currency.upper()
 
         # Created by functions
         self.config = self.parse_yaml()
@@ -62,7 +63,7 @@ class UpbitT(CexManagerT):
     def order_buy(self, buy: dict):
         print(
             PrettyColors.HEADER 
-            + "Upbit Order Buy Execute" 
+            + "Upbit Order Buy Process" 
             + PrettyColors.ENDC,
             flush=True
         )
@@ -71,16 +72,7 @@ class UpbitT(CexManagerT):
     def order_sell(self, sell: dict):
         print(
             PrettyColors.HEADER 
-            + "Upbit Order Sell Execute" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
-        return 
-
-    def order_tpsl(self, take_profit: float, stop_loss: float):
-        print(
-            PrettyColors.HEADER 
-            + "Upbit Order TakeProfit StopLoss Execute"
+            + "Upbit Order Sell Process" 
             + PrettyColors.ENDC,
             flush=True
         )
