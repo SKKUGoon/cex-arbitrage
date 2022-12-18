@@ -1,0 +1,19 @@
+local-server:
+  address: <example address 0.0.0.0>
+  port: <example port 8080>
+
+redis:
+  login:
+    user: <example redis user>
+    password: <example redis password>
+  conn:
+    host: <example redis host>
+    port: <example redis port>
+  pubsub:
+    tradechannel: <trade message channel>
+    signalchannel: <signal message channel>
+  
+telegram:
+  BotName: <>
+  BotUsername: <>
+  Token: <telegram token>
