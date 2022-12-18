@@ -47,8 +47,8 @@ if __name__ == "__main__":
     print(
         PrettyColors.WARNING
         + f"Band Updated. {time.strftime('%c', time.localtime())}\n"
-        + f"Container sleeping for {int(job_start-job_done)}secs before restarting"
+        + f"Container worked for {int(job_done-job_start)}secs before restarting"
         + PrettyColors.ENDC,
         flush=True
     )
-    time.sleep(job_start-job_done)
+    time.sleep(60 * 5 - (job_done - job_start))  # 60sec * 5 = 5 minutes
