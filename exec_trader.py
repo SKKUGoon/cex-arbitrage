@@ -9,11 +9,26 @@ if __name__ == "__main__":
     # Parse flags for execution
     parser = argparse.ArgumentParser()
     parser.add_argument("-host", "--hostname", help="Name of host. Service name such as trade_control")
+    parser.add_argument("-upbitkey", "--upbitkeycurrency", help="Upbit's key currency")
+    parser.add_argument("-binancekey", "--binancekeycurrency", help="Binance's key currency")
+    parser.add_argument("-upbitir", "--upbitinvestratio", help="Upbit's invest ratio wrt balance")
+    parser.add_argument("-binanceir", "--binanceinvestratio", help="Binance's invest raio wrt balance")
 
     args = parser.parse_args()
 
-    binance_t = BinanceFutureT()
-    upbit_t = UpbitT()
+    binance_t = BinanceFutureT(
+        args.binancekeycurrency.upper()
+    )
+    upbit_t = UpbitT(
+        args.upbitkeycurrency.upper()
+    )
 
-    arb = ArbitrageIEXA(binance_t, upbit_t, args.hostname)
-    arb.listen("trade_channel")
+    arbitrager = ArbitrageIEXA(
+        exchange_long=upbit_t, 
+        exchange_short=binance_t, 
+        long_total_use=args.upbitinvestratio, 
+        short_total_use=args.binanceinvestratio,
+        hostname=args.hostname
+    )
+    arbitrager.listen("trade_channel", None, None)
+  
