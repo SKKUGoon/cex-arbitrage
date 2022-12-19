@@ -43,8 +43,28 @@ During the commits, it underwent a major design changes from using websockets to
 - Add flag parse to employ deploy option. hostname, environment key asset etc. Add key currency flag for both exchange. ( [d234261](https://github.com/SKKUGoon/cex-arbitrage/commit/d234261c9e953b766a300abdc9240f2b6eda31f0), [ec34061](https://github.com/SKKUGoon/cex-arbitrage/commit/ec34061398e7d3eaf3e31f5db5e2657c81313175), [55108e5](https://github.com/SKKUGoon/cex-arbitrage/commit/55108e5521269bcf42100065e3e2f2a75c82d7d1), [6f527f0](https://github.com/SKKUGoon/cex-arbitrage/commit/6f527f0b78896416d160cc69c84f875f5b0ff8d0) )
 - Trade `BUSD` not `USDT` since `BUSD` offers little-trading fees. ( [d6532e3](https://github.com/SKKUGoon/cex-arbitrage/commit/d6532e3597e3b7eeac4105d3a26f8535ea0e2ab0) )
 
-### Bugs and Fixes.
+### Bugs and Fixes
 - In `requirements.txt` for python, <b>delete</b> `websocket` package. Python uses `websocket-client` package only. PIP Installing it both will cause errors. ( [9dc20ab](https://github.com/SKKUGoon/cex-arbitrage/commit/9dc20abf5a313665ea1f53325c7a4fe445218f57) )
 - Delete unused functions such as single-websocket run, single asset band generation etc. Delete unused functions from backend, after changing from websocket method to redis message queue like model (PubSub) ( [f9e419a](https://github.com/SKKUGoon/cex-arbitrage/commit/f9e419a524fee5546b87cc16abece6ed0850bf17), [cd00191](https://github.com/SKKUGoon/cex-arbitrage/commit/cd00191c45c3ddd4f18b68dc316736557e946d79), [cbac6b7](https://github.com/SKKUGoon/cex-arbitrage/commit/cbac6b7bff50c7ad82827b613d9ba3ace312b817) )
 - Refactor: script file name. Separate trading related classes into *_trade.py files ( [361ccde](https://github.com/SKKUGoon/cex-arbitrage/commit/361ccde9667bd0425dd677431bb31bfd41e03851) )
-- Terminal not showing the work inside terminal even if its still working. Fix it by adding `flush=True` to all `print()` in python script. [Stackoverflow reference](https://stackoverflow.com/questions/74811707/python-docker-container-not-running-simultaneously/74811891#74811891). ( [a2dae2c] )
+- Terminal not showing the work inside terminal even if its still working. Fix it by adding `flush=True` to all `print()` in python script. [Stackoverflow reference](https://stackoverflow.com/questions/74811707/python-docker-container-not-running-simultaneously/74811891#74811891). ( [a2dae2c]() )
+
+
+## v0.6
+
+### Main features
+Add the features related to trading IEXA strategies. 
+
+
+- BinanceFutureT, UpbitT (trader class) has `self.EX_CURRENCY` attribute. ( [a5e2a6d]() )
+- Delete TPSL order (Take profit, stop loss) function in `CexManagerT` class and `CexFactoryT`. ( [84c0845]() )
+- Create leverage calculation class `Leverage`( [ab464e4]() )
+- Create flag for additional external variables - key currency for both exchange. Refactor Dockerfile. ( [ee999ba]() )
+- Create callback function for entering, checking and exiting arbitrage position. ( [850525b]() )
+
+### Sub features
+- Delete unnecessary config files. Add Backend example configuration file. `config_example.yaml` (Not recorded on git) ( [ec7a949]() )
+- CexManagerT class object's balance now returns open position asset set(). ( [6565d0b]() )
+
+### Bugs and Fixes
+- Fix wrong `time.sleep` calculation for container restart. Container restart after exit code (0) ( [23c2b03]() )
