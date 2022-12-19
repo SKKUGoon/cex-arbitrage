@@ -115,6 +115,8 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
                 packet["data"]["asset_premium"] = {
                     "asset": a,
                     "premium": premium,
+                    "long_ex_bap": l['orderbook_units'][0]['ask_price'],
+                    "short_ex_bbp": float(s['b']),
                 }
                 # Handle 3-1)
                 packet_dump = json.dumps(packet)
