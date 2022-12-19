@@ -22,7 +22,6 @@ func TestCacheNewConn(t *testing.T) {
 	}
 
 	err = yaml.Unmarshal(dat, &redisInfo)
-	fmt.Println(redisInfo)
 	if err != nil {
 		log.Panicln("Conn config file parse error", err)
 	}

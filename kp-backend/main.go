@@ -28,6 +28,6 @@ func main() {
 
 	wsBase := api.New(myEnv)
 
-	ws := wsBase.Serve("./Config.yaml", *envPtr)
+	ws := wsBase.Serve(myEnv, *envPtr)
 	log.Fatal(ws.ListenAndServe())
 }
