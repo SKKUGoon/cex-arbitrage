@@ -16,9 +16,9 @@ func main() {
 	var myEnv string
 	switch *envPtr {
 	case "dev":
-		myEnv = "./Redis.yaml"
+		myEnv = "./config_dev.yaml"
 	case "deploy":
-		myEnv = "./Redis_deploy.yaml"
+		myEnv = "./config_deploy.yaml"
 	}
 	// PubSub
 	dao.SignalMQ = dao.NewSignalReciever(myEnv)

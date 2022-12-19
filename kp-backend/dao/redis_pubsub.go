@@ -60,7 +60,7 @@ func getBandInfo(bandUD string, client *redis.Client) (map[string]string, error)
 // send out trading message, in Signal[Trade] format
 // @param CurrentPremium: parsed incoming message.
 // @param upper, lower: map[string]string that looks like {<asset name>: <boundary value>}
-func comparePremium(p CurrentPremium, upper, lower map[string]string) ([]Signal[Trade], bool) {
+func comparePremium(p CurrentPremium, upper, lower map[string]string) (Arbitrage, bool) {
 	common.PrintYellowOperation("Comparing currentPremium with upper and lower band information")
 	var (
 		long  Signal[Trade]
@@ -77,7 +77,7 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) ([]Signal[
 				thresUp-thresLow, p.AssetPremium.Asset,
 			),
 		)
-		return []Signal[Trade]{}, false
+		return Arbitrage{}, false
 	}
 
 	switch {
@@ -89,10 +89,14 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) ([]Signal[
 		long.Data.Exchange = "upbit"
 		long.Data.Position = "long"
 		long.Data.Asset = p.AssetPremium.Asset
+		long.Data.LongPrc = p.AssetPremium.LongBestAskPrc
+		long.Data.ShortPrc = p.AssetPremium.ShortBestBidPrc
 
 		short.Data.Exchange = "binance"
 		short.Data.Position = "short"
 		short.Data.Asset = p.AssetPremium.Asset
+		short.Data.LongPrc = p.AssetPremium.LongBestAskPrc
+		short.Data.ShortPrc = p.AssetPremium.ShortBestBidPrc
 
 	case p.AssetPremium.Premium > thresUp:
 		// Exit position
@@ -102,10 +106,14 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) ([]Signal[
 		long.Data.Exchange = "upbit"
 		long.Data.Position = "short"
 		long.Data.Asset = p.AssetPremium.Asset
+		long.Data.LongPrc = p.AssetPremium.LongBestAskPrc
+		long.Data.ShortPrc = p.AssetPremium.ShortBestBidPrc
 
 		short.Data.Exchange = "binance"
 		short.Data.Position = "long"
 		short.Data.Asset = p.AssetPremium.Asset
+		short.Data.LongPrc = p.AssetPremium.LongBestAskPrc
+		short.Data.ShortPrc = p.AssetPremium.ShortBestBidPrc
 	default:
 		common.PrintBlueStatus(
 			fmt.Sprintf(
@@ -114,9 +122,12 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) ([]Signal[
 				thresLow, p.AssetPremium.Premium, thresUp,
 			),
 		)
-		return []Signal[Trade]{}, false
+		return Arbitrage{}, false
 	}
-	return []Signal[Trade]{long, short}, true
+	return Arbitrage{
+		Long:  long.Data,
+		Short: short.Data,
+	}, true
 }
 
 func (mq *SignalMessageQueue) broadcastSignal(msg []byte) {
@@ -147,13 +158,10 @@ func (mq *SignalMessageQueue) mqHandler() {
 			_ = json.Unmarshal(sigM, &p)
 			tradeSigs, ok := comparePremium(p.Data, bandUpper, bandLower)
 			if ok {
-				for _, trade := range tradeSigs {
-					tradePacket, _ := json.Marshal(trade)
-					err := mq.client.Publish(ctx, "trade_channel", tradePacket).Err()
-					if err != nil {
-						common.PrintPurpleWarning(err.Error())
-						continue
-					}
+				tradePacket, _ := json.Marshal(tradeSigs)
+				err := mq.client.Publish(ctx, "trade_channel", tradePacket).Err()
+				if err != nil {
+					common.PrintPurpleWarning(err.Error())
 				}
 			}
 			continue
