@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"fmt"
 	"kimchi/common"
 	"log"
 	"os"
@@ -22,7 +21,7 @@ func CacheNewConn(configFile string) *redis.Client {
 	if err != nil {
 		log.Panicln("Redis conn config file parse error:", err)
 	}
-	fmt.Println(redisInfo)
+
 	common.PrintBlueStatus(redisInfo["redis"].Conn.Host + ":" + redisInfo["redis"].Conn.Port)
 	common.PrintBlueStatus(redisInfo["redis"].Login.Password)
 	client := redis.NewClient(&redis.Options{

@@ -40,21 +40,17 @@ type Signal[T any] struct {
 	Data   T      `json:"data,omitempty"`
 }
 
-type Arbitrage struct {
-	Long  Trade `json:"arblong"`
-	Short Trade `json:"arbshort"`
+type Position struct {
+	Type     string  `json:"t" example:"enter"`
+	Xlong    string  `json:"exl" example:"upbit"`
+	Xshort   string  `json:"exs" example:"binance"`
+	Asset    string  `json:"a" example:"DOGE"`
+	PrcLong  float64 `json:"pl" example:"103"`
+	PrcShort float64 `json:"ps" example:"0.07732"`
 }
 
 type StatusMessage struct {
 	Message string `json:"message" example:"some message"`
-}
-
-type Trade struct {
-	Exchange string  `json:"ex" example:"binance"`
-	Position string  `json:"p" example:"short"`
-	Asset    string  `json:"a" example:"BTC"`
-	LongPrc  float64 `json:"lp" example:"2000000"`
-	ShortPrc float64 `json:"sp" example:"17500"`
 }
 
 type CurrentPremium struct {

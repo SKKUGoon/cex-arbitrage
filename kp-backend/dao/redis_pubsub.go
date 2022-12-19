@@ -60,11 +60,10 @@ func getBandInfo(bandUD string, client *redis.Client) (map[string]string, error)
 // send out trading message, in Signal[Trade] format
 // @param CurrentPremium: parsed incoming message.
 // @param upper, lower: map[string]string that looks like {<asset name>: <boundary value>}
-func comparePremium(p CurrentPremium, upper, lower map[string]string) (Arbitrage, bool) {
+func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position, bool) {
 	common.PrintYellowOperation("Comparing currentPremium with upper and lower band information")
 	var (
-		long  Signal[Trade]
-		short Signal[Trade]
+		pos Position
 	)
 
 	thresLow, _ := strconv.ParseFloat(lower[p.AssetPremium.Asset], 64)
@@ -77,43 +76,28 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Arbitrage
 				thresUp-thresLow, p.AssetPremium.Asset,
 			),
 		)
-		return Arbitrage{}, false
+		return Position{}, false
 	}
 
 	switch {
 	case p.AssetPremium.Premium < thresLow:
 		// Enter position
-		long.Type = "trade"
-		short.Type = "trade"
-
-		long.Data.Exchange = "upbit"
-		long.Data.Position = "long"
-		long.Data.Asset = p.AssetPremium.Asset
-		long.Data.LongPrc = p.AssetPremium.LongBestAskPrc
-		long.Data.ShortPrc = p.AssetPremium.ShortBestBidPrc
-
-		short.Data.Exchange = "binance"
-		short.Data.Position = "short"
-		short.Data.Asset = p.AssetPremium.Asset
-		short.Data.LongPrc = p.AssetPremium.LongBestAskPrc
-		short.Data.ShortPrc = p.AssetPremium.ShortBestBidPrc
+		pos.Type = "enter"
+		pos.Xlong = "upbit"
+		pos.Xshort = "binance"
+		pos.Asset = p.AssetPremium.Asset
+		pos.PrcLong = p.AssetPremium.LongBestAskPrc
+		pos.PrcShort = p.AssetPremium.ShortBestBidPrc
 
 	case p.AssetPremium.Premium > thresUp:
 		// Exit position
-		long.Type = "trade"
-		short.Type = "trade"
+		pos.Type = "exit"
+		pos.Xlong = "upbit"
+		pos.Xshort = "binance"
+		pos.Asset = p.AssetPremium.Asset
+		pos.PrcLong = p.AssetPremium.LongBestAskPrc
+		pos.PrcShort = p.AssetPremium.ShortBestBidPrc
 
-		long.Data.Exchange = "upbit"
-		long.Data.Position = "short"
-		long.Data.Asset = p.AssetPremium.Asset
-		long.Data.LongPrc = p.AssetPremium.LongBestAskPrc
-		long.Data.ShortPrc = p.AssetPremium.ShortBestBidPrc
-
-		short.Data.Exchange = "binance"
-		short.Data.Position = "long"
-		short.Data.Asset = p.AssetPremium.Asset
-		short.Data.LongPrc = p.AssetPremium.LongBestAskPrc
-		short.Data.ShortPrc = p.AssetPremium.ShortBestBidPrc
 	default:
 		common.PrintBlueStatus(
 			fmt.Sprintf(
@@ -122,12 +106,9 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Arbitrage
 				thresLow, p.AssetPremium.Premium, thresUp,
 			),
 		)
-		return Arbitrage{}, false
+		return Position{}, false
 	}
-	return Arbitrage{
-		Long:  long.Data,
-		Short: short.Data,
-	}, true
+	return pos, true
 }
 
 func (mq *SignalMessageQueue) broadcastSignal(msg []byte) {
