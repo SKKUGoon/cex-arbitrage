@@ -3,3 +3,4 @@ __pycache__/
 
 exchange.yaml
 ./.venv
+test.py

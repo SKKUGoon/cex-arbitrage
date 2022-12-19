@@ -68,3 +68,28 @@ Add the features related to trading IEXA strategies.
 
 ### Bugs and Fixes
 - Fix wrong `time.sleep` calculation for container restart. Container restart after exit code (0) ( [23c2b03]() )
+
+
+## v0.6.1
+
+### Bugs and Fixes
+- Fix aftermath of deleting config file `Redis.yaml` and `Config.yaml`.
+  - Fix `Redis.yaml` disappearance. ./kp-backend/dao 's redis connection function, and yaml parsing tools. ( [e74f8b5]() )
+  - Fix `Config.yaml` disappearance. ( [8c7d6b9]() )
+  - Fix example `config_example.yaml` file ( [8c7d6b9]() )
+
+
+## v0.7
+
+### Main features
+- Message Queue: Change trade_channel message. ( [3eee896]() )
+  - Message now emits price information.
+  - Changed from (giving out exchange-wise trade orders) to (trade pair-wise trade orders)
+  - Price is delievered from python websocket `sig.py`. Transfers best ask price and best bid price from each exchange ( [cd5cf58]() )
+- Trader Buying & Selling Now possible!  ( [b93ef6a]() )
+
+### Sub features
+- Hedge ratio 1:1 calculator function ( [ca02e4f]() )
+
+### Bugs and Fixes
+- Bugfix. Binance future trader class config file. API should have order authorization. ( [cee06ea]())
