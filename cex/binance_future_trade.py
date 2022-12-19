@@ -15,7 +15,7 @@ class BinanceFutureT(CexManagerT):
         # Created by functions
         self.config = self.parse_yaml()
         self.conn = self.connection()
-    
+
     def parse_yaml(self) -> Dict:
         # Create self.config
         print(
@@ -27,8 +27,8 @@ class BinanceFutureT(CexManagerT):
         cp = ConfigParse("./exchange.yaml")
         d = cp.parse()
         return {
-            'apiKey': d[self.EX_ID]['info']['api-key'],
-            'secret': d[self.EX_ID]['info']['api-pass'],
+            'apiKey': d[self.EX_ID]['trade']['api-key'],
+            'secret': d[self.EX_ID]['trade']['api-pass'],
             'options': {'defaultType': 'future'}
         }
     
