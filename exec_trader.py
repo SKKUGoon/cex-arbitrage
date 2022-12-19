@@ -23,11 +23,14 @@ if __name__ == "__main__":
         args.upbitkeycurrency.upper()
     )
 
+    upbit_ir = float(args.upbitinvestratio)
+    binance_ir = float(args.binanceinvestratio)
+
     arbitrager = ArbitrageIEXA(
         exchange_long=upbit_t, 
         exchange_short=binance_t, 
-        long_total_use=args.upbitinvestratio, 
-        short_total_use=args.binanceinvestratio,
+        long_total_use=upbit_ir, 
+        short_total_use=binance_ir,
         hostname=args.hostname
     )
     arbitrager.listen("trade_channel", None, None)

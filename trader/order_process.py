@@ -1,4 +1,5 @@
 from cex.cex_factory_trade import CexManagerT, CexFactoryT
+from .pair_pos import iexa_check_pos, iexa_enter_pos, iexa_exit_pos
 from utility.hedge import Leverage
 from utility.parse_yaml import ConfigParse
 from utility.coloring import PrettyColors
@@ -115,6 +116,25 @@ class ArbitrageIEXA:
                         continue
 
                     print(jdata)
+                    if jdata["t"] == "enter":
+                        iexa_enter_pos(
+                            mq_data=jdata,
+                            lev=self.day_leverage,
+                            balance=self.multi_bal,
+                            order_ratio=0.1,
+                            long_ex=self.long,
+                            short_ex=self.short,
+                        )
+                        self.multi_bal = self._get_balance()
+                    elif jdata["t"] == "exit":
+                        iexa_exit_pos(
+                            mq_data=jdata,
+                            long_ex=self.long,
+                            short_ex=self.short,
+                        )
+                        self.multi_bal = self._get_balance()
+                    else:
+                        print(PrettyColors.FAIL + "wrong message" + PrettyColors.ENDC)
 
 
         

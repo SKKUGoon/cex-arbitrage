@@ -13,4 +13,4 @@ COPY . .
 
 ENTRYPOINT [ "python" ]
 # why do we use busd only? to ensure low transaction fee
-CMD [ "exec_trader.py", "-host=redis", "-upbitkey=KRW", "-binancekey=BUSD" ]
+CMD [ "exec_trader.py", "-host=redis", "-upbitkey=KRW", "-binancekey=BUSD", "-upbitir=1", "-binanceir=1" ]
