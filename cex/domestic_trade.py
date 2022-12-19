@@ -42,6 +42,16 @@ class UpbitT(CexManagerT):
         conn = ccxt.upbit(config=self.config)
         return conn
 
+    @staticmethod
+    def _open_position(total_position: list, key_currency: str) -> tuple:
+        opened = list()
+        opened_set = set()
+        for p in total_position:
+            if p['currency'] != key_currency:
+                opened.append(p)
+                opened_set.add(p['currency'])
+        return opened, opened_set
+
     def balance(self, key_currency: str="KRW") -> Dict:
         print(
             PrettyColors.HEADER 
@@ -51,13 +61,16 @@ class UpbitT(CexManagerT):
         )
         b = self.conn.fetch_balance()
         # Upbit is a currency exchange.
-        # Not explicitly a position        
+        # Not explicitly a position    
+        o_pos, o_pos_set = self._open_position(b['info'], key_currency)    
         return {
             'key_balance': {
                 'asset': key_currency,
                 'balance': b[key_currency],
             },
-            'open_position': [op for op in b['info'] if op['currency'] != key_currency]
+            # 'open_position': [op for op in b['info'] if op['currency'] != key_currency],
+            'open_position': o_pos,
+            'open_position_set': o_pos_set,
         }
 
     def order_buy(self, buy: dict):

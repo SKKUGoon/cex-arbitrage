@@ -2,7 +2,7 @@ from utility.coloring import PrettyColors
 from utility.parse_yaml import ConfigParse
 from .cex_factory_trade import CexManagerT
 
-from typing import Dict, List
+from typing import Dict
 
 import ccxt
 
@@ -43,12 +43,15 @@ class BinanceFutureT(CexManagerT):
         conn = ccxt.binance(config=self.config)
         return conn
 
-    def _open_position(self, total_position: list) -> List:
+    @staticmethod
+    def _open_position(total_position: list) -> tuple:
         opened = list()
+        opened_set = set()
         for p in total_position:
             if float(p['positionAmt']) != 0:
                 opened.append(p)
-        return opened
+                opened_set.add(p['symbol'])
+        return opened, opened_set
         
     def balance(self, key_currency: str) -> Dict:
         print(
@@ -60,12 +63,14 @@ class BinanceFutureT(CexManagerT):
         # balance: {... 'balance': {'free': ..., 'used': ..., 'total': ...,}} 
         # open_position: [{ open position infos ... }]
         b = self.conn.fetch_balance()
+        o_pos, o_pos_set = self._open_position(b['info']['positions'])
         return {
             'key_balance': {
                 'asset': key_currency,
                 'balance': b[key_currency],
             },
-            'open_position': self._open_position(b['info']['positions']),
+            'open_position': o_pos,
+            'open_position_set': o_pos_set,
         }
 
     def order_buy(self, buy: dict):
