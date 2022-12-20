@@ -93,3 +93,14 @@ Add the features related to trading IEXA strategies.
 
 ### Bugs and Fixes
 - Bugfix. Binance future trader class config file. API should have order authorization. ( [cee06ea]())
+
+
+## v0.7.1
+
+## Main features
+Version v0.7.1 contains fixes after running field test1. Field test1 is conducted on December 21st, on POP-OS Linux machine. 
+
+- Changes in docker compose file. ( [2855183]() )
+
+## Bugs and Fixes
+- Not trading Buy-sell pair, but was instead doing Buy-Buy. ( [e0a3c4d]() [b7f0b4d]() )
