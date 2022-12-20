@@ -104,3 +104,4 @@ Version v0.7.1 contains fixes after running field test1. Field test1 is conducte
 
 ## Bugs and Fixes
 - Not trading Buy-sell pair, but was instead doing Buy-Buy. ( [e0a3c4d]() [b7f0b4d]() )
+- Check balance again ( [5917d7b]() )
