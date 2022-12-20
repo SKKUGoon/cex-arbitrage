@@ -38,7 +38,7 @@ def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, l
     short_ex.conn.create_order(
         f"{asset}/{short_ex.EX_CURRENCY}",
         "market",
-        "buy",
+        "sell",
         so_quantity,
         mq_data["ps"],
     )
