@@ -105,3 +105,12 @@ Version v0.7.1 contains fixes after running field test1. Field test1 is conducte
 ## Bugs and Fixes
 - Not trading Buy-sell pair, but was instead doing Buy-Buy. ( [e0a3c4d]() [b7f0b4d]() )
 - Check balance again ( [5917d7b]() )
+
+
+## v0.7.2
+
+## Main features
+
+Two bugs were discovered during 2 days of test run. 1) Not entering position with sell-buy but entering position in buy-buy. 2) Not able to detect already bought object. 1) is fixed in v0.7.1
+
+- 2) is fixed. Binance open_position_set needed keycurrency. For example, upbit has "WAVES" but in binance has "WAVESBUSD"

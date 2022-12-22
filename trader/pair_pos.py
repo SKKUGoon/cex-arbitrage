@@ -56,7 +56,7 @@ def iexa_check_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
     lb = long_ex.balance(long_ex.EX_CURRENCY)
     sb = short_ex.balance(short_ex.EX_CURRENCY)
     lb_has_asset = asset in lb['open_position_set']
-    sb_has_asset = asset in sb['open_position_set']
+    sb_has_asset = f"{asset}{short_ex.EX_CURRENCY}".upper() in sb['open_position_set']
     if lb_has_asset and sb_has_asset:
         return True
     else:
@@ -82,6 +82,14 @@ def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
         amount=binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}"),
         params={"reduceOnly": True}
     )
+    # short_ex.conn.create_order(
+    #     f"{asset}/{short_ex.EX_CURRENCY}",
+    #     "market",
+    #     "buy",
+    #     amount=binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}"),
+    #     mq_data["ps"],
+    #     params={"reduceOnly": True}
+    # )
 
 def binance_pos_balance(ex: CexManagerT, tgt: str) -> str:
     bals = ex.conn.fetch_balance()
