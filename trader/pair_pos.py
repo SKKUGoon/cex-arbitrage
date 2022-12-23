@@ -77,11 +77,8 @@ def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
         upbit_pos_balance(long_ex, f"{asset}".upper()),
         mq_data["pl"]
     )
-    # short_ex.conn.create_market_buy_order(
-    #     symbol=f"{asset}/{short_ex.EX_CURRENCY}",
-    #     amount=float(binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}")),
-    #     params={"reduceOnly": True}
-    # )
+    # Add abs() to the quantity. Because short selling position is given to us in MINUS form.
+    # For example, if you shorted 128 DOGE, it will return -128. 
     short_ex.conn.create_order(
         f"{asset}/{short_ex.EX_CURRENCY}",
         "market",

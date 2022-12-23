@@ -97,23 +97,35 @@ Add the features related to trading IEXA strategies.
 
 ## v0.7.1
 
-## Main features
+### Main features
 Version v0.7.1 contains fixes after running field test1. Field test1 is conducted on December 21st, on POP-OS Linux machine. 
 
 - Changes in docker compose file. ( [2855183]() )
 
-## Bugs and Fixes
+### Bugs and Fixes
 - Not trading Buy-sell pair, but was instead doing Buy-Buy. ( [e0a3c4d]() [b7f0b4d]() )
 - Check balance again ( [5917d7b]() )
 
 
 ## v0.7.2
 
-## Main features
+### Main features
 
 Two bugs were discovered during 2 days of test run. 1) Not entering position with sell-buy but entering position in buy-buy. 2) Not able to detect already bought object. 1) is fixed in v0.7.1. Websocket problem is not python specific, but more efficient error-proof websocket module is being developed in branch `upgrade/wss`.
 
 - 2) is fixed. Binance open_position_set needed keycurrency. For example, upbit has "WAVES" but in binance has "WAVESBUSD" ( [12de847]() )
 
-## Bugs and Fixes
+### Bugs and Fixes
 - `get_balance` after trading had missing variable input. Fixed. ( [412e74c]() )
+
+
+## v0.7.3
+
+### Main features
+- Change websocket from spot stream to future stream ( [584f21d]() )
+- Anticipate slippeage rate. Resize band width threshold from 0.015 to 0.02 ( [babaa34]() )
+
+### Bugs and Fixes
+- Fix `iexa_exit_pos`, by adding `abs()` to the quantity of the function. ( [a49e969]() )
+  - Short position in binance will give you negative quantity(<0) value. 
+  - When giving out market orders it should be ordering positive value.
