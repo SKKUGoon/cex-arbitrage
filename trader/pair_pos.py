@@ -77,19 +77,19 @@ def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
         upbit_pos_balance(long_ex, f"{asset}".upper()),
         mq_data["pl"]
     )
-    short_ex.conn.create_market_buy_order(
-        symbol=f"{asset}/{short_ex.EX_CURRENCY}",
-        amount=float(binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}")),
-        params={"reduceOnly": True}
-    )
-    # short_ex.conn.create_order(
-    #     f"{asset}/{short_ex.EX_CURRENCY}",
-    #     "market",
-    #     "buy",
-    #     amount=binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}"),
-    #     mq_data["ps"],
+    # short_ex.conn.create_market_buy_order(
+    #     symbol=f"{asset}/{short_ex.EX_CURRENCY}",
+    #     amount=float(binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}")),
     #     params={"reduceOnly": True}
     # )
+    short_ex.conn.create_order(
+        f"{asset}/{short_ex.EX_CURRENCY}",
+        "market",
+        "buy",
+        abs(float(binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}"))),
+        mq_data["ps"],
+        params={"reduceOnly": True}
+    )
 
 def binance_pos_balance(ex: CexManagerT, tgt: str) -> str:
     bals = ex.conn.fetch_balance()
