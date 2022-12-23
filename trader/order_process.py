@@ -126,8 +126,8 @@ class ArbitrageIEXA:
                             short_ex=self.short,
                         )
                         self.multi_bal = self._get_balance()
-                        print("Balance updated: long", self.long.balance())
-                        print("Balance updated: short", self.short.balance())
+                        print("Balance updated: long", self.long.balance(self.long.EX_CURRENCY))
+                        print("Balance updated: short", self.short.balance(self.short.EX_CURRENCY))
                     elif jdata["t"] == "exit":
                         iexa_exit_pos(
                             mq_data=jdata,
@@ -135,8 +135,8 @@ class ArbitrageIEXA:
                             short_ex=self.short,
                         )
                         self.multi_bal = self._get_balance()
-                        print("Balance updated: long", self.long.balance())
-                        print("Balance updated: short", self.short.balance())
+                        print("Balance updated: long", self.long.balance(self.long.EX_CURRENCY))
+                        print("Balance updated: short", self.short.balance(self.short.EX_CURRENCY))
                     else:
                         print(PrettyColors.FAIL + "wrong message" + PrettyColors.ENDC)
 

@@ -79,7 +79,7 @@ def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
     )
     short_ex.conn.create_market_buy_order(
         symbol=f"{asset}/{short_ex.EX_CURRENCY}",
-        amount=binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}"),
+        amount=float(binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}")),
         params={"reduceOnly": True}
     )
     # short_ex.conn.create_order(
