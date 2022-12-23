@@ -114,3 +114,6 @@ Version v0.7.1 contains fixes after running field test1. Field test1 is conducte
 Two bugs were discovered during 2 days of test run. 1) Not entering position with sell-buy but entering position in buy-buy. 2) Not able to detect already bought object. 1) is fixed in v0.7.1. Websocket problem is not python specific, but more efficient error-proof websocket module is being developed in branch `upgrade/wss`.
 
 - 2) is fixed. Binance open_position_set needed keycurrency. For example, upbit has "WAVES" but in binance has "WAVESBUSD" ( [12de847]() )
+
+## Bugs and Fixes
+- `get_balance` after trading had missing variable input. Fixed. ( [412e74c]() )
