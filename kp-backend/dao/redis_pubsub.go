@@ -13,7 +13,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-const MINIMUM_BOUND_LENGTH = 0.015
+const MINIMUM_BOUND_LENGTH = 0.020
 
 var SignalMQ SignalMessageQueue
 var ctx = context.Background()
@@ -72,8 +72,8 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 	if math.Abs(thresUp-thresLow) < MINIMUM_BOUND_LENGTH {
 		common.PrintPurpleWarning(
 			fmt.Sprintf(
-				"KP Bollinger band not large enough %v for %s. No Profit anticipated. Passing",
-				thresUp-thresLow, p.AssetPremium.Asset,
+				"Asset: %s | No Profit anticipated\nBand not large enough | Size: %v",
+				p.AssetPremium.Asset, thresUp-thresLow,
 			),
 		)
 		return Position{}, false
