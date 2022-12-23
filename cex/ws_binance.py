@@ -8,7 +8,8 @@ import websocket
 
 
 def binance_ws_multi(watch_list: dict, q_dict: dict, key_currency: str):
-    endpoint_url = "wss://stream.binance.com:9443/ws"
+    # endpoint_url = "wss://stream.binance.com:9443/ws" <- for spot
+    endpoint_url = "wss://fstream.binance.com/ws"
     my_id = 42
 
     def subscription(ticker_subject: dict) -> Dict:
