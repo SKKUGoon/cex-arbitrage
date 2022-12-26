@@ -1,6 +1,8 @@
 package dao
 
-import "github.com/go-redis/redis/v8"
+import (
+	"github.com/go-redis/redis/v8"
+)
 
 type redisNewLogin struct {
 	Login   redisPI
@@ -66,8 +68,14 @@ type CurrentPremium struct {
 	} `json:"asset_premium"`
 }
 
+type BlockNotice struct {
+	Asset    string `json:"asset" example:"SOL"`
+	Complete bool   `json:"complete" example:"true"`
+}
+
 type SignalMessageQueue struct {
 	client        *redis.Client
 	SignalMessage chan []byte
 	TradeMessage  chan []byte
+	NoticeMessage chan []byte
 }

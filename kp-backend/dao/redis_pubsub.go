@@ -13,7 +13,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-const MINIMUM_BOUND_LENGTH = 0.020
+const MINIMUM_BOUND_LENGTH = 0.018
 
 var SignalMQ SignalMessageQueue
 var ctx = context.Background()
@@ -23,10 +23,12 @@ var ctx = context.Background()
 // @param configFile redis login info yaml file
 func NewSignalReciever(configFile string) SignalMessageQueue {
 	c := CacheNewConn(configFile)
-	common.PrintGreenOk("Subscribe to Redis `Signal` Channel")
+	common.PrintGreenOk("Goroutine Notice: Redis `Signal` Channel")
+	common.PrintGreenOk("Goroutine Notice: Redis `Trade` Channel")
 	return SignalMessageQueue{
 		client:        c,
 		SignalMessage: make(chan []byte, 1000),
+		NoticeMessage: make(chan []byte, 1000),
 		TradeMessage:  make(chan []byte, 1000),
 	}
 }
@@ -36,7 +38,7 @@ func NewSignalReciever(configFile string) SignalMessageQueue {
 // @param bandUD: whether it is upper or lower
 // @param client: redis database
 func getBandInfo(bandUD string, client *redis.Client) (map[string]string, error) {
-	common.PrintYellowOperation("Getting band upper, lower from redis")
+	common.PrintYellowOperation("Get band upper, lower from redis")
 	// Get Band information
 	var bandMap map[string]string
 	var err error
@@ -61,7 +63,7 @@ func getBandInfo(bandUD string, client *redis.Client) (map[string]string, error)
 // @param CurrentPremium: parsed incoming message.
 // @param upper, lower: map[string]string that looks like {<asset name>: <boundary value>}
 func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position, bool) {
-	common.PrintYellowOperation("Comparing currentPremium with upper and lower band information")
+	common.PrintYellowOperation("Premium Comparison")
 	var (
 		pos Position
 	)
@@ -69,19 +71,19 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 	thresLow, _ := strconv.ParseFloat(lower[p.AssetPremium.Asset], 64)
 	thresUp, _ := strconv.ParseFloat(upper[p.AssetPremium.Asset], 64)
 
-	if math.Abs(thresUp-thresLow) < MINIMUM_BOUND_LENGTH {
-		common.PrintPurpleWarning(
-			fmt.Sprintf(
-				"Asset: %s | No Profit anticipated\nBand not large enough | Size: %v",
-				p.AssetPremium.Asset, thresUp-thresLow,
-			),
-		)
-		return Position{}, false
-	}
-
 	switch {
+	// Enter position
 	case p.AssetPremium.Premium < thresLow:
-		// Enter position
+		// If no profit anticipated, don't emit `enter` signal
+		if math.Abs(thresUp-thresLow) < MINIMUM_BOUND_LENGTH {
+			common.PrintBlueStatus(
+				fmt.Sprintf(
+					"Asset: %s | No Profit anticipated | BandSize: %.3f",
+					p.AssetPremium.Asset, thresUp-thresLow,
+				),
+			)
+			return Position{}, false
+		}
 		pos.Type = "enter"
 		pos.Xlong = "upbit"
 		pos.Xshort = "binance"
@@ -89,8 +91,11 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 		pos.PrcLong = p.AssetPremium.LongBestAskPrc
 		pos.PrcShort = p.AssetPremium.ShortBestBidPrc
 
+	// Exit position
 	case p.AssetPremium.Premium > thresUp:
-		// Exit position
+		// Exit signal should be made regardless of band size.
+		// since the band size might have been reduced after the
+		// opening of the position.
 		pos.Type = "exit"
 		pos.Xlong = "upbit"
 		pos.Xshort = "binance"
@@ -98,10 +103,11 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 		pos.PrcLong = p.AssetPremium.LongBestAskPrc
 		pos.PrcShort = p.AssetPremium.ShortBestBidPrc
 
+	// Between the band - No position
 	default:
 		common.PrintBlueStatus(
 			fmt.Sprintf(
-				"Asset %s || (low) %v < %v < %v (up) || No Trade",
+				"Asset %s || (low) %.3f < %.3f < %.3f (up) || No Trade",
 				p.AssetPremium.Asset,
 				thresLow, p.AssetPremium.Premium, thresUp,
 			),
@@ -115,6 +121,10 @@ func (mq *SignalMessageQueue) broadcastSignal(msg []byte) {
 	mq.SignalMessage <- msg
 }
 
+func (mq *SignalMessageQueue) broadcastNotice(msg []byte) {
+	mq.NoticeMessage <- msg
+}
+
 // mqHandler *SignalMessageQueue
 // infinite loop that sends out trade messages. If threshold is outside boundary
 // Sendout trade messages.
@@ -123,7 +133,6 @@ func (mq *SignalMessageQueue) mqHandler() {
 	// Initial Band information
 	var bandUpper map[string]string
 	var bandLower map[string]string
-	var p Signal[CurrentPremium]
 	bandUpper, err1 := getBandInfo("upper", mq.client)
 	bandLower, err2 := getBandInfo("lower", mq.client)
 	if err1 != nil || err2 != nil {
@@ -135,15 +144,59 @@ func (mq *SignalMessageQueue) mqHandler() {
 		select {
 		case sigM := <-mq.SignalMessage:
 			// Compare signal with band
-			// Send out Trade message
-			_ = json.Unmarshal(sigM, &p)
+			var p Signal[CurrentPremium]
+			err := json.Unmarshal(sigM, &p)
+			if err != nil {
+				common.PrintPurpleWarning("malfored signal_channel message")
+				continue
+			}
 			tradeSigs, ok := comparePremium(p.Data, bandUpper, bandLower)
 			if ok {
+				// Send out Trade message
 				tradePacket, _ := json.Marshal(tradeSigs)
 				err := mq.client.Publish(ctx, "trade_channel", tradePacket).Err()
 				if err != nil {
 					common.PrintPurpleWarning(err.Error())
 				}
+			}
+			continue
+
+		case notM := <-mq.NoticeMessage:
+			// Notice Board trading message
+			var p Signal[BlockNotice]
+			var tradeSigs Position
+			err := json.Unmarshal(notM, &p)
+			if err != nil {
+				common.PrintPurpleWarning("malformed notice_channel message")
+				continue
+			}
+			switch {
+			case !p.Data.Complete:
+				// Enter position. Upbit closing their transfer
+				tradeSigs = Position{
+					Type:     "enter",
+					Xlong:    "upbit",
+					Xshort:   "binance",
+					Asset:    p.Data.Asset,
+					PrcLong:  -1,
+					PrcShort: -1,
+				}
+			case p.Data.Complete:
+				// Exit position. Upbit finished their maintenance
+				tradeSigs = Position{
+					Type:     "exit",
+					Xlong:    "upbit",
+					Xshort:   "binance",
+					Asset:    p.Data.Asset,
+					PrcLong:  -1,
+					PrcShort: -1,
+				}
+			}
+			// Send out Trade message
+			tradePacket, _ := json.Marshal(tradeSigs)
+			err = mq.client.Publish(ctx, "trade_channel", tradePacket).Err()
+			if err != nil {
+				common.PrintPurpleWarning(err.Error())
 			}
 			continue
 
@@ -158,16 +211,33 @@ func (mq *SignalMessageQueue) mqHandler() {
 	}
 }
 
-// Run *SignalMessageQueue
-// Goroutine mqHandler. Plus insert message using `broadcastSignal` method.
-func (mq *SignalMessageQueue) Run() error {
-	go mq.mqHandler()
+func (mq *SignalMessageQueue) mqToSigChan() {
 	subscriber := mq.client.Subscribe(ctx, "signal_channel")
 	for {
 		msg, err := subscriber.ReceiveMessage(ctx)
 		if err != nil {
-			log.Panicln(err)
+			common.PrintRedError("redis pubsub on signal_channel receive error", err.Error())
 		}
 		mq.broadcastSignal([]byte(msg.Payload))
 	}
+}
+
+func (mq *SignalMessageQueue) mqToNotChan() {
+	subscriber := mq.client.Subscribe(ctx, "notice_channel")
+	for {
+		msg, err := subscriber.ReceiveMessage(ctx)
+		if err != nil {
+			common.PrintRedError("redis pubsub on notice_channel receive error", err.Error())
+		}
+		mq.broadcastNotice([]byte(msg.Payload))
+	}
+}
+
+// Run *SignalMessageQueue
+// Goroutine mqHandler. Plus insert message using `broadcastSignal` method.
+func (mq *SignalMessageQueue) Run() {
+	// c1, cancel := context.WithCancel(context.Background())
+	go mq.mqToSigChan()
+	go mq.mqToNotChan()
+	mq.mqHandler()
 }

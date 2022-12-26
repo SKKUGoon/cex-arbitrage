@@ -87,7 +87,7 @@ func (client InternalServer) Serve(configFile string, configEnv string) *http.Se
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	common.PrintBlueStatus("deploying on ", src.Addr)
+	common.PrintCyanStatus("deploying on ", src.Addr)
 	return src
 }
 
