@@ -79,7 +79,7 @@ class ArbitrageIEXA:
         
         return app_lev[COMPARISON]
 
-    def listen(self, channel_name: str, callback_enter_pos: callable, callback_exit_pos: callable):
+    def listen(self, channel_name: str):
         """
         Infinte loop that has 2 callback functions
           - `callback_enter_pos`
@@ -115,9 +115,8 @@ class ArbitrageIEXA:
                         print(PrettyColors.FAIL + e + PrettyColors.ENDC)
                         continue
 
-                    print(jdata)
                     if jdata["t"] == "enter":
-                        iexa_enter_pos(
+                        is_exec = iexa_enter_pos(
                             mq_data=jdata,
                             lev=self.day_leverage,
                             balance=self.multi_bal,
@@ -125,15 +124,23 @@ class ArbitrageIEXA:
                             long_ex=self.long,
                             short_ex=self.short,
                         )
+                        if not is_exec:
+                            # Stop calling binance asset when no trade is made
+                            PrettyColors().print_ok_blue(val="No trade made")
+                            continue
                         self.multi_bal = self._get_balance()
                         print("Balance updated: long", self.long.balance(self.long.EX_CURRENCY))
                         print("Balance updated: short", self.short.balance(self.short.EX_CURRENCY))
                     elif jdata["t"] == "exit":
-                        iexa_exit_pos(
+                        is_exec = iexa_exit_pos(
                             mq_data=jdata,
                             long_ex=self.long,
                             short_ex=self.short,
                         )
+                        if not is_exec:
+                            # Stop calling binance asset when no trade is made
+                            PrettyColors().print_ok_blue(val="No trade made")
+                            continue
                         self.multi_bal = self._get_balance()
                         print("Balance updated: long", self.long.balance(self.long.EX_CURRENCY))
                         print("Balance updated: short", self.short.balance(self.short.EX_CURRENCY))

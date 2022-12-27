@@ -4,7 +4,7 @@ from utility.hedge import hedge
 from utility.coloring import PrettyColors
 
 
-def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, long_ex: CexManagerT, short_ex: CexManagerT):
+def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, long_ex: CexManagerT, short_ex: CexManagerT) -> bool:
     if iexa_check_pos(mq_data, long_ex, short_ex):
         print(
             PrettyColors.WARNING
@@ -12,7 +12,7 @@ def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, l
             + PrettyColors.ENDC
         )
         # If asset position is already present, discontinue
-        return
+        return False
 
     # Both market enter-position-order for an asset
     asset = mq_data['a']
@@ -42,8 +42,9 @@ def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, l
         so_quantity,
         mq_data["ps"],
     )
+    return True
 
-def iexa_check_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
+def iexa_check_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT) -> bool:
     """
     Each `CexManagerT` object has method `balance`. `balance` returns 
     "open_position_set" keys.
@@ -62,10 +63,10 @@ def iexa_check_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
     else:
         return False
 
-def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
+def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT) -> bool:
     if not iexa_check_pos(mq_data, long_ex, short_ex):
         # If there's no position to exit, discontinue
-        return
+        return False
     
     # Both market exit-position-order for an asset
     asset = mq_data["a"]
@@ -87,6 +88,7 @@ def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT):
         mq_data["ps"],
         params={"reduceOnly": True}
     )
+    return True
 
 def binance_pos_balance(ex: CexManagerT, tgt: str) -> str:
     bals = ex.conn.fetch_balance()
