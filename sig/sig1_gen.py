@@ -39,27 +39,34 @@ def gen_signal_notice(env: str, hostname: str, common_trade: set):
         notice_channel = {"type": "notice", "status": True}
         
         if not is_complete and ok:
-            # Enter position
             dfmt = "%Y-%m-%dT%H:%M:%S%z"
             parsed_ct = datetime.strptime(d['created_at'], dfmt)
-            if _is_recent_info(parsed_ct, RECENT_STANDARD):
-                for t in notice_ticker:
-                    # If trade not supported: pass
-                    if t not in common_trade:
-                        continue
-
-                    notice_channel["data"] = {"asset": t, "complete": False}
-                    packet_dump = json.dumps(notice_channel)
-                    r.publish(channel=NOTICE_CHANNEL, message=packet_dump)
+            if not _is_recent_info(parsed_ct, RECENT_STANDARD):
+                PrettyColors().print_ok_blue(f"{', '.join(notice_ticker)} ENTER notice outdated.")
+                continue
+            # Enter position
+            for t in notice_ticker:
+                # If trade not supported: pass
+                if t not in common_trade:
+                    continue
+                # Message Pub/Sub
+                notice_channel["data"] = {"asset": t, "complete": False}
+                packet_dump = json.dumps(notice_channel)
+                r.publish(channel=NOTICE_CHANNEL, message=packet_dump)
 
         elif is_complete and ok:
+            dfmt = "%Y-%m-%dT%H:%M:%S%z"
+            parsed_ct = datetime.strptime(d['created_at'], dfmt)
+            if not _is_recent_info(parsed_ct, RECENT_STANDARD):
+                PrettyColors().print_ok_blue(f"{', '.join(notice_ticker)} EXIT notice outdated.")
+                continue
             # Exit existing position
             notice_channel = {"type": "notice", "status": True}
             for t in notice_ticker:
                 # If trade not supported: pass
                 if t not in common_trade:
                     continue
-
+                # Message Pub/Sub
                 notice_channel["data"] = {"asset": t, "complete": True}
                 packet_dump = json.dumps(notice_channel)
                 r.publish(channel=NOTICE_CHANNEL, message=packet_dump)
