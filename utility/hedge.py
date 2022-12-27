@@ -1,4 +1,3 @@
-from .coloring import PrettyColors
 from typing import Dict
 
 

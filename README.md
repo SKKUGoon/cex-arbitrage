@@ -15,7 +15,25 @@ Docker compose file is online. (<b>Require at least docker-compose version 2</b>
 
 If one should change the key currency trading pair, look inside `./docker` and edit each `Dockerfile` for their respective containers. 
 
-## 3. File Scheme
+## 3. Status 
+
+Backend
+- Green Print : OK sign
+- Blue Print : Trade fail sign.
+- Cyan Print : Deploy environment status.
+- Yellow Print : Any sort of operation. 
+- Purple Print : Warning or error. Not severe. Definitely not stopping to program. 
+
+Python
+- Bold Print :
+- Underline Print : 
+- Green Print : OK sign
+- Blue Print : 
+- Cyan Print :
+- Warning Print (Orange) : 
+- Fail Print (Red) : Outright Fail!
+
+## 4. File Scheme
 <details>
 <summary>File Tree</summary>
 

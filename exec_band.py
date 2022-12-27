@@ -44,11 +44,8 @@ if __name__ == "__main__":
         hostname=args.hostname
     )
     job_done = time.time()
-    print(
-        PrettyColors.WARNING
-        + f"Band Updated. {time.strftime('%c', time.localtime())}\n"
-        + f"Container worked for {int(job_done-job_start)}secs before restarting"
-        + PrettyColors.ENDC,
-        flush=True
+    PrettyColors().print_warning(
+        val=f"Band Updated. {time.strftime('%c', time.localtime())}"
     )
+    # Wait for 5 minute. After 5 minute, container restart.
     time.sleep(60 * 5 - (job_done - job_start))  # 60sec * 5 = 5 minutes

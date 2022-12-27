@@ -129,3 +129,37 @@ Two bugs were discovered during 2 days of test run. 1) Not entering position wit
 - Fix `iexa_exit_pos`, by adding `abs()` to the quantity of the function. ( [a49e969]() )
   - Short position in binance will give you negative quantity(<0) value. 
   - When giving out market orders it should be ordering positive value.
+
+## v0.8
+
+### Main features
+- Prep backend for new new strategy. ( [cb4762a]() )
+  - Open a new message channel `notice_channel`
+    - message example: `{"type": "notice", "status": true, "data": {"asset": "SOL", "complete": false}}`
+  - Create structure for `notice_channel` message input. `Signal[BlockNotice]`
+  - Add channel `NoticeMessage` in `SignalMessageQueue`
+  - Organize goroutines
+    - `mqToSigChan`: message queue signal_channel -> goroutine data channel
+    - `mqToNotChan`: message queue notice_channel -> goroutine data channel
+- New strategy - Notice Enclosed Premium ( [8e60c1a]() )
+  - The premium on one exchange will rise, if there is not much coin influx. Take the premium by going long on the enclosed exchange, and hedging the position on the other exchange.
+  - Crawler with python script. Dockerfile + Docker compose config file. Restart container every 1 minute. ( [27113a7]() )
+  - If the message is old, (more then `RECENT_STANDARD` minute) it does not send any message to `notice_channel`. ( [412207b]() )
+
+### Sub features
+- Code refactoring
+  - Create print_color functions ( [9733b45]() )
+- `order_process.py`: add trade executed bool for `iexa_enter_pos` function and `iexa_exit_pos` function. If the return boolean is <b>False</b>, it does not update the balance - since no trade was made. Else if the return boolean is <b>True</b>, it updates the balance like before. This reduces calls to Binance and Upbit by not calling binance and upbit api everytime no-trade message is sent. ( [a79c691]() )  
+
+### Bugs and Fixes
+- Before: If signal in the message channel was malformed, it will emit msg to `trade_channel` regardless, which could lead to error in the trading module. But Now: if the signal message is malformed, it emits warning message in purple and continues loop. ( [cb4762a]() )
+- Before: Position Exit signal could not be made if the band size shrink. But Now: Position Exit signal can be emitted regardless of the band size. ( [cb4762a]() )
+- Before: no rules for printing colors in backend. But now: rules. ( [cb4762a]() )
+  - Green Print : OK sign
+  - Blue Print : Trade fail sign.
+  - Cyan Print : Deploy environment status
+  - Yellow Print : Any sort of operation. 
+  - Purple Print : Warning or error. Not severe. Definitely not stopping to program.  
+- Delete password print in `CacheNewConn`. ( [cb4762a]() )
+- Add `config_dev.yaml` in local storage (git ignored).
+- Reduce `MINIMUM_BOUND_LENGTH` from 0.02 to 0.018. ( [cb4762a]() )

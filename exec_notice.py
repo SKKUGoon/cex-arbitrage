@@ -28,7 +28,6 @@ if __name__ == "__main__":
 
     strat = StrategyIEXANotice(upbit_x, binance_x)
     a = strat.target_assets(upbit_key_currency, binance_key_currency)
-    print(a)
 
     strat.run(
         env=args.environment,

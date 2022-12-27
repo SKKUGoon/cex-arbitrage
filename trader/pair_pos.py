@@ -6,12 +6,8 @@ from utility.coloring import PrettyColors
 
 def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, long_ex: CexManagerT, short_ex: CexManagerT) -> bool:
     if iexa_check_pos(mq_data, long_ex, short_ex):
-        print(
-            PrettyColors.WARNING
-            + "Signaled asset already present, No order sent"
-            + PrettyColors.ENDC
-        )
         # If asset position is already present, discontinue
+        PrettyColors().print_warning("Signaled asset ALREADY present, No orders sent")
         return False
 
     # Both market enter-position-order for an asset
@@ -66,6 +62,7 @@ def iexa_check_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT) -
 def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT) -> bool:
     if not iexa_check_pos(mq_data, long_ex, short_ex):
         # If there's no position to exit, discontinue
+        PrettyColors().print_warning("Signaled asset NOT present, No orders sent")
         return False
     
     # Both market exit-position-order for an asset
