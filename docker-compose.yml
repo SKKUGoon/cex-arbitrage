@@ -56,5 +56,15 @@ services:
       trade_control:
         condition: service_healthy
 
+  premium_notice:
+    build:
+      context: .
+      dockerfile: ./docker/premium_notice/Dockerfile
+    ports:
+      - "8084:8084"
+    depends_on:
+      trade_control:
+        condition: service_healthy
+
 volumes:
   redis_data:
