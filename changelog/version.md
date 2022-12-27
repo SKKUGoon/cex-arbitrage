@@ -155,11 +155,14 @@ Two bugs were discovered during 2 days of test run. 1) Not entering position wit
 - Before: If signal in the message channel was malformed, it will emit msg to `trade_channel` regardless, which could lead to error in the trading module. But Now: if the signal message is malformed, it emits warning message in purple and continues loop. ( [cb4762a]() )
 - Before: Position Exit signal could not be made if the band size shrink. But Now: Position Exit signal can be emitted regardless of the band size. ( [cb4762a]() )
 - Before: no rules for printing colors in backend. But now: rules. ( [cb4762a]() )
-  - Green Print : OK sign
-  - Blue Print : Trade fail sign.
-  - Cyan Print : Deploy environment status
-  - Yellow Print : Any sort of operation. 
-  - Purple Print : Warning or error. Not severe. Definitely not stopping to program.  
+  - Backend
+    - Green Print : OK sign
+    - Blue Print : Trade fail sign.
+    - Cyan Print : Deploy environment status
+    - Yellow Print : Any sort of operation. 
+    - Purple Print : Warning or error. Not severe. Definitely not stopping to program.  
+  - Python Scripts ( [ce5850f]() )
+    - (Updating process)
 - Delete password print in `CacheNewConn`. ( [cb4762a]() )
 - Add `config_dev.yaml` in local storage (git ignored).
 - Reduce `MINIMUM_BOUND_LENGTH` from 0.02 to 0.018. ( [cb4762a]() )
