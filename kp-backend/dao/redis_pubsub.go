@@ -78,7 +78,7 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 		if math.Abs(thresUp-thresLow) < MINIMUM_BOUND_LENGTH {
 			common.PrintBlueStatus(
 				fmt.Sprintf(
-					"Asset: %s | No Profit anticipated | BandSize: %.3f",
+					"| Asset: %-7v | No Profit anticipated             | BandSize: %.3f |",
 					p.AssetPremium.Asset, thresUp-thresLow,
 				),
 			)
@@ -86,8 +86,8 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 		}
 		common.PrintGreenOk(
 			fmt.Sprintf(
-				"Asset: %s | Lower than thres %.4f | BandSize: %.3f",
-				p.AssetPremium.Asset, thresLow, thresUp-thresLow,
+				"| Asset: %-7v | Lower than thres %.4f > %.4f  | BandSize: %.3f |",
+				p.AssetPremium.Asset, thresLow, p.AssetPremium.Premium, thresUp-thresLow,
 			),
 		)
 		pos.Type = "enter"
@@ -105,8 +105,8 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 		// opening of the position.
 		common.PrintGreenOk(
 			fmt.Sprintf(
-				"Asset: %s | Higher than thres %.4f | BandSize: %.3f",
-				p.AssetPremium.Asset, thresUp, thresUp-thresLow,
+				"| Asset: %-7v | Higher than thres %.4f < %.4f | BandSize: %.3f |",
+				p.AssetPremium.Asset, thresUp, p.AssetPremium.Premium, thresUp-thresLow,
 			),
 		)
 		pos.Type = "exit"
@@ -119,11 +119,15 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 
 	// Between the band - No position
 	default:
+		bInfo := fmt.Sprintf(
+			"(low) %.3f < %.3f < %.3f (up)",
+			thresLow, p.AssetPremium.Premium, thresUp,
+		)
 		common.PrintBlueStatus(
 			fmt.Sprintf(
-				"Asset: %s | (low) %.3f < %.3f < %.3f (up) | No Trade",
+				"| Asset: %-7v | %-33v | Middle No Trade |",
 				p.AssetPremium.Asset,
-				thresLow, p.AssetPremium.Premium, thresUp,
+				bInfo,
 			),
 		)
 		return Position{}, false

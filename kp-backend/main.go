@@ -26,7 +26,7 @@ func main() {
 		dao.SignalMQ.Run()
 	}()
 
-	wsBase := api.New(myEnv)
+	wsBase := api.New(myEnv, *envPtr)
 
 	ws := wsBase.Serve(myEnv, *envPtr)
 	log.Fatal(ws.ListenAndServe())
