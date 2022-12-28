@@ -9,7 +9,7 @@ import re
 import redis
 
 TAG: Final = "[안내]"
-CLUE: Final = "입출금"
+CLUE: Final = ["입출금", "일시", "중단"]
 DONE: Final = "완료"
 RECENT_STANDARD: Final = 1 # minute
 NOTICE_CHANNEL = "notice_channel"
@@ -89,19 +89,22 @@ def _parse_title(t: str):
     # Sort out 
     if TAG not in t[:4].replace(" ", ""):
         return [""], False, False
-    
-    if CLUE not in t:
+
+    if any([c not in t for c in CLUE]):
         return [""], False, False
 
-    try:    
+    try:
         # Single: 1. Get the coin ticker inside `( )`
         start_ = t.index("(")
         end_ = t.index(")")
         t_parse = t[start_ + 1 : end_]
         pattern = ("[^a-zA-Z0-9,]")
         t_parse = re.sub(pattern, "", t_parse)
+        if t_parse == "":
+            # Context inside `()` is not ticker. It could be DONE
+            raise ValueError
         
-    except ValueError as e:
+    except ValueError as _:
         # Multi 2. Get the Big Alphabet.  
         pattern = ("[^a-zA-Z0-9,]")
         t_parse = re.sub(pattern, "", t)
