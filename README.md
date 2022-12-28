@@ -25,12 +25,13 @@ Backend
 - Purple Print : Warning or error. Not severe. Definitely not stopping to program. 
 
 Python
-- Bold Print :
-- Underline Print : 
+- Bold Print : Reporting purpose
+- Underline Print : Infinite Loop Run start
+- Header Pring (Purple) : All CexManagerX, CexManagerT Function Order.
 - Green Print : OK sign
-- Blue Print : 
-- Cyan Print :
-- Warning Print (Orange) : 
+- Blue Print : OK sign. But Not leading to trade. 
+- Cyan Print : OK sign - on Not Exchange Modules. (Signals)
+- Warning Print (Orange) : Unfavorable condition. But Continue. 
 - Fail Print (Red) : Outright Fail!
 
 ## 4. File Scheme
