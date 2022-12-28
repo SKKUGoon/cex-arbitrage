@@ -42,12 +42,7 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
     { <asset name>: multiprocessing.Queue, ... }
     @param data_collect: how much time period between each premium calc burst.(secs)
     """
-    print(
-        PrettyColors.WARNING 
-        + "GEN_SIGNAL_IEXA_MULTI infinite loop start" 
-        + PrettyColors.ENDC,
-        flush=True
-    )
+    PrettyColors().print_underline("GEN_SIGNAL_IEXA_MULTI infinite loop start")
     # Signal burst in seconds
     if env.lower() == "dev":
         r = redis.Redis(host=hostname, port=6379, db=0)
@@ -63,12 +58,7 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
             # Handle 1)
             fx_value, true_val = forex()
             if not true_val:
-                print(
-                    PrettyColors.WARNING + 
-                        "Foreign Exchange Rate, Approximated" + 
-                        PrettyColors.ENDC,
-                    flush=True
-                )
+                PrettyColors().print_warning("Foreign Exchange Rate, Approximated")
 
         packet = {
             "type": "iexa",
@@ -87,23 +77,15 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
             try:
                 l = qs_long[a].get(timeout=2)
             except Exception as e:
-                print(
-                    PrettyColors.WARNING 
-                    + f"Asset {a}:: data queue LONG empty" 
-                    + PrettyColors.ENDC,
-                    flush=True
-                )
+                PrettyColors().print_warning(f"Asset {a}:: data queue LONG empty")
                 l = None
+
             try :
                 s = qs_short[a].get(timeout=2)
             except Exception as e:
-                print(
-                    PrettyColors.WARNING 
-                    + f"Asset {a}:: data queue SHORT empty" 
-                    + PrettyColors.ENDC,
-                    flush=True
-                )
+                PrettyColors().print_warning(f"Asset {a}:: data queue SHORT empty")
                 s = None
+
             if not collect:
                 continue
 
@@ -121,19 +103,10 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
                 # Handle 3-1)
                 packet_dump = json.dumps(packet)
                 r.publish(channel="signal_channel", message=packet_dump)
-                print(
-                    PrettyColors.OKGREEN 
-                    + f"Premium {a} published" 
-                    + PrettyColors.ENDC,
-                    flush=True
-                )
+                PrettyColors().print_ok_green(f"Premium {a} published")
+
             else:
-                print(
-                    PrettyColors.FAIL 
-                    + f"Premium {a}: No Calc" 
-                    + PrettyColors.ENDC,
-                    flush=True
-                )
+                PrettyColors().print_fail(f"Premium {a}: No Calc")
             # Reset time.
             start = time.time()
             
@@ -143,10 +116,7 @@ def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexM
     @param exchange_long, exchange_short: Class type CexManagerX 
     @param burst_interval_min: Signal bursting request by minutes
     """
-    print(
-        PrettyColors.WARNING + "GEN_BAND_IEXA start" + PrettyColors.ENDC,
-        flush=True
-    )
+    PrettyColors().print_underline("GEN_BAND_IEXA start")
     cm = CexFactoryX()
     # Signal burst in seconds
     if env.lower() == "dev":
@@ -195,26 +165,13 @@ def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexM
             "data": post_premium_data
         })
         if resp.status_code == 200:
-            print(
-                PrettyColors.OKGREEN 
-                + f"{resp.json()['type']} {resp.json()['data']['message']}"
-                + PrettyColors.ENDC,
-                flush=True
+            PrettyColors().print_ok_green(
+                f"{resp.json()['type']} {resp.json()['data']['message']}"
             )
         else:
-            print(
-                PrettyColors.FAIL 
-                + f"{resp.status_code} {resp.json()['data']['message']}"
-                + PrettyColors.ENDC,
-                flush=True
+            PrettyColors().print_fail(
+                f"{resp.status_code} {resp.json()['data']['message']}"
             )
-        print(post_premium_data)
     # End of update
-    print(
-        PrettyColors.WARNING 
-        + "GEN_BAND_IEXA end" 
-        + PrettyColors.ENDC,
-        flush=True
-    )
-        
+    PrettyColors().print_underline("GEN_BAND_IEXA end")
         

@@ -14,6 +14,9 @@ class PrettyColors:
     
     def print_underline(self, val):
         print(self.UNDERLINE + val + self.ENDC, flush=True)
+
+    def print_status_purple(self, val):
+        print(self.HEADER + val + self.ENDC, flush=True)
     
     def print_ok_blue(self, val):
         print(self.OKBLUE + val + self.ENDC, flush=True)

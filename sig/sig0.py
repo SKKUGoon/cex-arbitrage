@@ -28,7 +28,7 @@ class StrategyIEXA:
         Find common assets pairs between exchange_long and exchange_short.
         Returns common currency in set
         """
-        print(PrettyColors.OKBLUE + "Update common traded asset" + PrettyColors.ENDC)
+        PrettyColors().print_ok_cyan("Update common traded asset")
         l = self.exchange.get_tradable(self.longX)[long_key_currency.upper()]
         s = self.exchange.get_tradable(self.shortX)[short_key_currency.upper()]
         
@@ -63,7 +63,7 @@ class StrategyIEXA:
         for asset in assets:
             multiq_long[asset]: mp.Queue = mp.Queue()
             multiq_short[asset]: mp.Queue = mp.Queue()
-        print(PrettyColors.OKBLUE + f"Created {len(assets)}# queues" + PrettyColors.ENDC)
+        PrettyColors().print_ok_cyan(f"Created {len(assets)}# queues")
         
         p1 = mp.Process(
           target=ws_func_long, 

@@ -18,12 +18,7 @@ class UpbitT(CexManagerT):
 
     def parse_yaml(self) -> Dict:
         # Create self.config
-        print(
-            PrettyColors.HEADER 
-            + "Upbit Config file" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("ESSENTIAL: Upbit Trader Config file")
         cp = ConfigParse("./exchange.yaml")
         d = cp.parse()
         return {
@@ -33,12 +28,7 @@ class UpbitT(CexManagerT):
 
     def connection(self):
         # Create self.conn
-        print(
-            PrettyColors.HEADER 
-            + "Upbit Trader Connection" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("ESSENTIAL: Upbit Trader Connection")
         conn = ccxt.upbit(config=self.config)
         return conn
 
@@ -53,12 +43,7 @@ class UpbitT(CexManagerT):
         return opened, opened_set
 
     def balance(self, key_currency: str="KRW") -> Dict:
-        print(
-            PrettyColors.HEADER 
-            + "Upbit Account Balance" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("Upbit Account Balance")
         b = self.conn.fetch_balance()
         # Upbit is a currency exchange.
         # Not explicitly a position    
@@ -74,28 +59,13 @@ class UpbitT(CexManagerT):
         }
 
     def order_buy(self, buy: dict):
-        print(
-            PrettyColors.HEADER 
-            + "Upbit Order Buy Process" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("Upbit Order Buy Process")
         return 
 
     def order_sell(self, sell: dict):
-        print(
-            PrettyColors.HEADER 
-            + "Upbit Order Sell Process" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("Upbit Order Sell Process")
         return 
 
     def trade_result(self):
-        print(
-            PrettyColors.HEADER 
-            + "Upbit Future Trade Result" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("Upbit Trade Result")
         return

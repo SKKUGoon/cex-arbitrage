@@ -16,12 +16,7 @@ def binance_ws_multi(watch_list: dict, q_dict: dict, key_currency: str):
         """
         @param ticker_subject: example {btcusdt: aggTrade}
         """
-        print(
-            PrettyColors.OKBLUE 
-            + "binance websocket subscription message generated" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_ok_cyan("binance websocket subscription message generated")
         sub = {
             "method": "SUBSCRIBE",
             "params": list(),
@@ -57,12 +52,7 @@ def binance_ws_multi(watch_list: dict, q_dict: dict, key_currency: str):
     # Define websocketapp's callback function:
     #   on_open, on_message and on_close.
     def on_open(ws):
-        print(
-            PrettyColors.UNDERLINE 
-            + "binance opened" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_ok_cyan("binance opened")
         sub_msg = subscription(watch_list)
         ws.send(json.dumps(sub_msg))
     
@@ -73,12 +63,7 @@ def binance_ws_multi(watch_list: dict, q_dict: dict, key_currency: str):
         # print("recv binance")
 
     def on_close(ws):
-        print(
-            PrettyColors.UNDERLINE 
-            + "binance closed" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_ok_cyan("binance closed")
         unsub_msg = unsubscription(watch_list)
         print(unsub_msg)
         ws.send(json.dumps(unsub_msg))

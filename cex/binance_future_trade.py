@@ -18,12 +18,7 @@ class BinanceFutureT(CexManagerT):
 
     def parse_yaml(self) -> Dict:
         # Create self.config
-        print(
-            PrettyColors.HEADER 
-            + "Binance Future Trader Config file" 
-            + PrettyColors.ENDC, 
-            flush=True
-        )
+        PrettyColors().print_status_purple("ESSENTIAL: Binance Future Trader Config file")
         cp = ConfigParse("./exchange.yaml")
         d = cp.parse()
         return {
@@ -34,12 +29,7 @@ class BinanceFutureT(CexManagerT):
     
     def connection(self):
         # Create self.conn
-        print(
-            PrettyColors.HEADER 
-            + "Binance Future Trader Connection" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("ESSENTIAL: Binance Future Trader Connection")
         conn = ccxt.binance(config=self.config)
         return conn
 
@@ -54,12 +44,7 @@ class BinanceFutureT(CexManagerT):
         return opened, opened_set
         
     def balance(self, key_currency: str) -> Dict:
-        print(
-            PrettyColors.HEADER 
-            + "Binance Future Account Balance" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("Binance Future Account Balance")
         # balance: {... 'balance': {'free': ..., 'used': ..., 'total': ...,}} 
         # open_position: [{ open position infos ... }]
         b = self.conn.fetch_balance()
@@ -74,30 +59,15 @@ class BinanceFutureT(CexManagerT):
         }
 
     def order_buy(self, buy: dict):
-        print(
-            PrettyColors.HEADER 
-            + "Binance Future Order Buy Process" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("Binance Future Order Buy Process")
         # self.conn.create_order()
         return 
 
     def order_sell(self, sell: dict):
-        print(
-            PrettyColors.HEADER 
-            + "Binance Future Order Sell Process" 
-            + PrettyColors.ENDC,
-            flush=True,
-        )
+        PrettyColors().print_status_purple("Binance Future Order Sell Process")
         # self.conn.create_order()
         return
     
     def trade_result(self):
-        print(
-            PrettyColors.HEADER 
-            + "Binance Future Trade Result" 
-            + PrettyColors.ENDC,
-            flush=True
-        ) 
+        PrettyColors().print_status_purple("Binance Future Trade Result")
         return 

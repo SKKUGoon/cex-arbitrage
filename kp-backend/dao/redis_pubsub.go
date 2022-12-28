@@ -63,7 +63,7 @@ func getBandInfo(bandUD string, client *redis.Client) (map[string]string, error)
 // @param CurrentPremium: parsed incoming message.
 // @param upper, lower: map[string]string that looks like {<asset name>: <boundary value>}
 func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position, bool) {
-	common.PrintYellowOperation("Premium Comparison")
+	// common.PrintYellowOperation("Premium Comparison")
 	var (
 		pos Position
 	)
@@ -84,30 +84,44 @@ func comparePremium(p CurrentPremium, upper, lower map[string]string) (Position,
 			)
 			return Position{}, false
 		}
+		common.PrintGreenOk(
+			fmt.Sprintf(
+				"Asset: %s | Lower than thres %.4f | BandSize: %.3f",
+				p.AssetPremium.Asset, thresLow, thresUp-thresLow,
+			),
+		)
 		pos.Type = "enter"
 		pos.Xlong = "upbit"
 		pos.Xshort = "binance"
 		pos.Asset = p.AssetPremium.Asset
 		pos.PrcLong = p.AssetPremium.LongBestAskPrc
 		pos.PrcShort = p.AssetPremium.ShortBestBidPrc
+		pos.RptPremium = p.AssetPremium.Premium
 
 	// Exit position
 	case p.AssetPremium.Premium > thresUp:
 		// Exit signal should be made regardless of band size.
 		// since the band size might have been reduced after the
 		// opening of the position.
+		common.PrintGreenOk(
+			fmt.Sprintf(
+				"Asset: %s | Higher than thres %.4f | BandSize: %.3f",
+				p.AssetPremium.Asset, thresUp, thresUp-thresLow,
+			),
+		)
 		pos.Type = "exit"
 		pos.Xlong = "upbit"
 		pos.Xshort = "binance"
 		pos.Asset = p.AssetPremium.Asset
 		pos.PrcLong = p.AssetPremium.LongBestAskPrc
 		pos.PrcShort = p.AssetPremium.ShortBestBidPrc
+		pos.RptPremium = p.AssetPremium.Premium
 
 	// Between the band - No position
 	default:
 		common.PrintBlueStatus(
 			fmt.Sprintf(
-				"Asset %s || (low) %.3f < %.3f < %.3f (up) || No Trade",
+				"Asset: %s | (low) %.3f < %.3f < %.3f (up) | No Trade",
 				p.AssetPremium.Asset,
 				thresLow, p.AssetPremium.Premium, thresUp,
 			),

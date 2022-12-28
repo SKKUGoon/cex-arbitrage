@@ -16,8 +16,9 @@ def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, l
     lo_money = balance['l'] * order_ratio
     lo_quantity = lo_money / mq_data["pl"]
     so_quantity = hedge(lo_quantity, lev)
+    p = mq_data["pm"]
     # so_money = balance['s'] * order_ratio
-    report_order("enter", asset, lo_quantity, so_quantity)
+    report_order("enter", asset, lo_quantity, so_quantity, p)
 
     long_ex.conn.create_order(
         f"{asset}/{long_ex.EX_CURRENCY}",
@@ -67,24 +68,29 @@ def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT) ->
     
     # Both market exit-position-order for an asset
     asset = mq_data["a"]
-    
+    lo_quantity = upbit_pos_balance(long_ex, f"{asset}".upper())
     long_ex.conn.create_order(
         f"{asset}/{long_ex.EX_CURRENCY}",
         "market",
         "sell",
-        upbit_pos_balance(long_ex, f"{asset}".upper()),
+        lo_quantity,
         mq_data["pl"]
     )
     # Add abs() to the quantity. Because short selling position is given to us in MINUS form.
-    # For example, if you shorted 128 DOGE, it will return -128. 
+    # For example, if you shorted 128 DOGE, it will return -128.
+    so_quantity = abs(
+        float(binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}"))
+    )
     short_ex.conn.create_order(
         f"{asset}/{short_ex.EX_CURRENCY}",
         "market",
         "buy",
-        abs(float(binance_pos_balance(short_ex, f"{asset}{short_ex.EX_CURRENCY}"))),
+        so_quantity,
         mq_data["ps"],
         params={"reduceOnly": True}
     )
+    p = mq_data["pm"]
+    report_order("exit", asset, lo_quantity, so_quantity, p)
     return True
 
 def binance_pos_balance(ex: CexManagerT, tgt: str) -> str:

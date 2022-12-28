@@ -15,7 +15,7 @@ RECENT_STANDARD: Final = 1 # minute
 NOTICE_CHANNEL = "notice_channel"
 
 def gen_signal_notice(env: str, hostname: str, common_trade: set):
-    PrettyColors().print_fail(val="GEN_SIGNAL_NOTICE INTERMITANT BURST")
+    PrettyColors().print_underline(val="GEN_SIGNAL_NOTICE INTERMITANT BURST")
     if env.lower() == "dev":
         r = redis.Redis(host=hostname, port=15214, db=0, password="mypassword")
     elif env.lower() == "deploy":

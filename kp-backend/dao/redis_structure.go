@@ -43,12 +43,13 @@ type Signal[T any] struct {
 }
 
 type Position struct {
-	Type     string  `json:"t" example:"enter"`
-	Xlong    string  `json:"exl" example:"upbit"`
-	Xshort   string  `json:"exs" example:"binance"`
-	Asset    string  `json:"a" example:"DOGE"`
-	PrcLong  float64 `json:"pl" example:"103"`
-	PrcShort float64 `json:"ps" example:"0.07732"`
+	Type       string  `json:"t" example:"enter"`
+	Xlong      string  `json:"exl" example:"upbit"`
+	Xshort     string  `json:"exs" example:"binance"`
+	Asset      string  `json:"a" example:"DOGE"`
+	PrcLong    float64 `json:"pl" example:"103"`
+	PrcShort   float64 `json:"ps" example:"0.07732"`
+	RptPremium float64 `json:"pm" example:"0.01"`
 }
 
 type StatusMessage struct {
