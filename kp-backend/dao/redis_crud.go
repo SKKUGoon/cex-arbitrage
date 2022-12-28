@@ -23,3 +23,12 @@ func RdbOpRead(r *redis.Client, ctx context.Context, key RdbKeyField) (map[strin
 	}
 	return result, nil
 }
+
+func RdbOpDelete(r *redis.Client, ctx context.Context, key RdbKeyField) error {
+	cmd := r.HDel(ctx, key.Key, key.Field)
+	err := cmd.Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
