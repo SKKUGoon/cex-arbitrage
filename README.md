@@ -1,7 +1,7 @@
 # Centralized Exchange (CEX) Arbitrage
 
 ## 1. Arbitrage container scheme.
-![alt text](./public/Cex-Arb_Diagram.drawio.png)
+![alt text](./public/Cex-Arb_Diagram_v0.8%2B%2B.jpg)
 
 Each of the title suggest the name of the container that's already written in `docker-compose.yaml` file, with its respective internal access ports. <b>Redis</b> database works as message queue handler that connects trade_control webserver(written with <b>Go</b>) and other premium containers. 
 
