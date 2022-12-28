@@ -173,3 +173,23 @@ Two bugs were discovered during 2 days of test run. 1) Not entering position wit
 - Delete password print in `CacheNewConn`. ( [cb4762a]() )
 - Add `config_dev.yaml` in local storage (git ignored).
 - Reduce `MINIMUM_BOUND_LENGTH` from 0.02 to 0.018. ( [cb4762a]() )
+
+## v0.8.1
+
+### Main features
+- Add new field to Redis key-value database. ( [45b87af]() )
+  - `beware` field: `asset`: `"no_enter"`
+    - <b>ADDED</b>
+      - `!p.Data.Complete` in `redis_pubsub.go` line 192
+    - <b>DELETE</b> 
+      - `p.Data.Complete` in `redis_pubsub.go` line 202
+
+### Bugs and Fixes
+- Delete unused directory `./kp-backend/ent` ( [e636339]() )
+- Organize backend printed value. Now it looks like this. ( [e636339]() )
+```console
+2022/12/28 14:53:32  [| Asset: LINK    | Higher than thres 0.0058 < 0.0101 | BandSize: 0.004 |] 
+2022/12/28 14:53:32  [| Asset: SAND    | Higher than thres 0.0057 < 0.0114 | BandSize: 0.004 |] 
+```
+- Add release mode according to environement. ( [e636339]() )
+- Flagged Asset on notice. Bug in the handler. Logic update( [bc77150]() )
