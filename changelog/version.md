@@ -208,3 +208,15 @@ Two bugs were discovered during 2 days of test run. 1) Not entering position wit
   - Upbit: Needs 1. quantity 2. price even if you are ordering through `market` price. They access `quantity * price` and buys for just that amount. 
   - Binance, if you order by `market`, `price` doesn't matter. 
   - For notice origin trading message, you must supply them with market price in order to hedge properly. 
+
+
+## v0.8.3
+
+### Main features
+- Fix websocket app.
+  - Make websocket app crash and restart on certain condition
+    - When Binance App or upbit app automatically closes websocket connection, crash the container, and then restart. ( [dc0b86f]() )
+      - Crashing is done by, setting `long_noval`, `short_noval` value. And at every iteration, if the websocket does not contain the asset's price value, add 1 respectively. If the `long_noval` or `short_noval` is equal to total number of asset, - which is highly unlikely since there are more than 20 assets, the app crashes.
+      - Process Websocket is assigned in process 1 and process 2 multiprocess. They are set as daemon process, so that sys.exit() will forcefully close them.
+      - Process 3 was originally inside multiprocess, but it's now taken out. 
+      - Restarting is done by setting up docker compose file accordingly. ( [7028f00]() )
