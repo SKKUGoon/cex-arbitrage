@@ -193,3 +193,18 @@ Two bugs were discovered during 2 days of test run. 1) Not entering position wit
 ```
 - Add release mode according to environement. ( [e636339]() )
 - Flagged Asset on notice. Bug in the handler. Logic update( [bc77150]() )
+
+
+## v0.8.2
+
+### Main features
+- Tweak strategy. ( [b0d4156]() )
+  - Adjust band generation data. from `5m` to `1d`. From `30` length to `20` length.
+  - Band length to 4%point. 
+  - Currently premium is at all time low (2022/12/30). Strategy change needed
+- Change the hedging method. ( [d47d2ae]() )
+  - From token quantity hedging to total spent capital hedging.
+- Notice_channel -> trade_channel gives no input about price of the exchange. It gives you as value of `-1`. Normal ordering method will return error. ( [62cdc0a]() )
+  - Upbit: Needs 1. quantity 2. price even if you are ordering through `market` price. They access `quantity * price` and buys for just that amount. 
+  - Binance, if you order by `market`, `price` doesn't matter. 
+  - For notice origin trading message, you must supply them with market price in order to hedge properly. 
