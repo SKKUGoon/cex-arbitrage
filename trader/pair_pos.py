@@ -1,6 +1,7 @@
 from cex.cex_factory_trade import CexManagerT
 from .order_report import report_order
-from utility.hedge import hedge
+from utility.hedge import hedge_quantity, hedge_capital
+from utility.fx import forex
 from utility.coloring import PrettyColors
 
 
@@ -14,18 +15,32 @@ def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, l
     asset = mq_data['a']
     # Calculate with hedge
     lo_money = balance['l'] * order_ratio
-    lo_quantity = lo_money / mq_data["pl"]
-    so_quantity = hedge(lo_quantity, lev)
+    lo_quantity = lo_money / 1  # possible because of Upbit. See changelog. 
+
+    if mq_data['ps'] == -1:
+        # No price given.
+        prc, ok = binance_market_price(long_ex, tgt_w_key=f"{asset}/{long_ex.EX_CURRENCY}")
+        if not ok:
+            PrettyColors().print_fail(
+                f"Failed to retrieve short market price for {asset}. No orders sent"
+            )
+            return False
+        # Access mq_data heap
+        mq_data['ps'] = prc
+    
+    so_quantity = hedge_capital(lo_money, lev, mq_data['ps'])
+
     p = mq_data["pm"]
     # so_money = balance['s'] * order_ratio
-    report_order("enter", asset, lo_quantity, so_quantity, p)
+    fx, _ = forex()
+    report_order("enter", asset, lo_money, so_quantity, fx, p)
 
     long_ex.conn.create_order(
         f"{asset}/{long_ex.EX_CURRENCY}",
         "market",
         "buy",
         lo_quantity,
-        mq_data["pl"]
+        1,  # lo_quantity * 1 = Total money ordering on upbit. 
     )
     # Adjust leverage for IEXA arb
     short_ex.conn.fapiPrivate_post_leverage({
@@ -37,7 +52,7 @@ def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, l
         "market",
         "sell",
         so_quantity,
-        mq_data["ps"],
+        mq_data["ps"],  # Here the price is ignored. 
     )
     return True
 
@@ -106,3 +121,17 @@ def upbit_pos_balance(ex: CexManagerT, tgt: str) -> str:
     for i in bals:
         if i["currency"] == tgt:
             return i["balance"]
+
+def binance_market_price(ex: CexManagerT, tgt_w_key: str) -> tuple:
+    """
+    If trading signal comes from notice, it's unable to provide valid market price.
+    So, order using standard binance Order Book API.
+    Since Binance is used for `short`, function return bask BAP (Best asking price)
+    GET /fapi/v1/depth
+    """
+    book = ex.conn.fetch_order_book(tgt_w_key, 5)
+    try:
+        bap, _bap_quantity = book["asks"][0]
+        return bap, True
+    except KeyError:
+        return 0, False
