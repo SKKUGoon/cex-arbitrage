@@ -45,6 +45,8 @@ services:
     depends_on:
       trade_control:
         condition: service_healthy
+    restart: unless-stopped
+    
 
   premium_trade:
     build:

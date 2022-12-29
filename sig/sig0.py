@@ -5,6 +5,7 @@ from utility.coloring import PrettyColors
 import multiprocessing as mp
 from typing import Set, Callable
 import sys
+import time
 
 
 class StrategyIEXA:
@@ -84,6 +85,7 @@ class StrategyIEXA:
         p2.start()
 
         gen_signal_iexa_multi(assets, multiq_long, multiq_short, hostname, env)
-        PrettyColors().print_ok_green("System exit. Daemon Process terminated")
+        PrettyColors().print_ok_green("System exit after 5 sec. Daemon Process terminated")
+        time.sleep(5)
         sys.exit()
         return
