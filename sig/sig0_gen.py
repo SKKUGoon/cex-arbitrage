@@ -4,6 +4,7 @@ from utility.bollinger import bollinger
 from utility.coloring import PrettyColors
 
 from typing import Final
+import multiprocessing as mp
 import time
 import json
 
@@ -51,8 +52,12 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
     else:
         raise RuntimeError(f"environment env={env} is not one of the specified")
 
+    # Loop Prep Value
+    num_asset: Final = len(qs_short)
     start = time.time()
     while True:
+        long_noval, short_noval = 0, 0
+
         collect = time.time() - start >= data_collect
         if collect:
             # Handle 1)
@@ -79,12 +84,14 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
             except Exception as e:
                 PrettyColors().print_warning(f"Asset {a}:: data queue LONG empty")
                 l = None
+                long_noval += 1  # long exchange didn't send ws msg for asset `a`
 
             try :
                 s = qs_short[a].get(timeout=2)
             except Exception as e:
                 PrettyColors().print_warning(f"Asset {a}:: data queue SHORT empty")
                 s = None
+                short_noval += 1  # short exchange didn't send ws msg for asset `a`
 
             if not collect:
                 continue
@@ -109,6 +116,16 @@ def gen_signal_iexa_multi(assets: set, qs_long: dict, qs_short: dict,
                 PrettyColors().print_fail(f"Premium {a}: No Calc")
             # Reset time.
             start = time.time()
+        
+        # Websocket down -> exit loop
+        cond_long_ws_down = long_noval >= num_asset
+        cond_short_ws_down = short_noval >= num_asset
+        if cond_long_ws_down:
+            PrettyColors().print_fail("Long Exchange Websocket Down")
+            return
+        if cond_short_ws_down:
+            PrettyColors().print_fail("Short Exchange Websocket Down")
+            return
             
 
 def gen_band_iexa(tickers: set, exchange_long: CexManagerX, exchange_short: CexManagerX, env: str="dev", hostname: str="localhost"):

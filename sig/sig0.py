@@ -4,6 +4,7 @@ from utility.coloring import PrettyColors
 
 import multiprocessing as mp
 from typing import Set, Callable
+import sys
 
 
 class StrategyIEXA:
@@ -65,6 +66,7 @@ class StrategyIEXA:
             multiq_short[asset]: mp.Queue = mp.Queue()
         PrettyColors().print_ok_cyan(f"Created {len(assets)}# queues")
         
+        # Set up websocket workers
         p1 = mp.Process(
           target=ws_func_long, 
           args=(x_long, multiq_long, ws_keycurr_long,))
@@ -72,15 +74,16 @@ class StrategyIEXA:
           target=ws_func_short, 
           args=(x_short, multiq_short, ws_keycurr_short,)
         )
-        p3 = mp.Process(
-          target=gen_signal_iexa_multi, 
-          args=(assets, multiq_long, multiq_short, hostname, env,)
-        )
+
+        # Set up as daemon process
+        p1.daemon = True
+        p2.daemon = True
+        PrettyColors().print_ok_cyan(f"Created p1, p2. Both as Daemon")
 
         p1.start()
         p2.start()
-        p3.start()
 
-        p1.join()
-        p2.join()
-        p3.join()  # Wait for completion
+        gen_signal_iexa_multi(assets, multiq_long, multiq_short, hostname, env)
+        PrettyColors().print_ok_green("System exit. Daemon Process terminated")
+        sys.exit()
+        return

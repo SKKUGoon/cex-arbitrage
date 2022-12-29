@@ -75,3 +75,4 @@ def binance_ws_multi(watch_list: dict, q_dict: dict, key_currency: str):
         on_close=on_close,
     )
     ws.run_forever()
+    ws.close()
