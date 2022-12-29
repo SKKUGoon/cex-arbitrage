@@ -60,9 +60,9 @@ class UpbitX(CexManagerX):
             )
         return result
 
-    def history(self, ticker: str, key_currency: str, hist_len: int=30):
+    def history(self, ticker: str, key_currency: str, hist_len: int=20):
         request_for = f"{ticker.upper()}/{key_currency.upper()}"
-        hist = self.conn.fetch_ohlcv(request_for, '5m', limit=hist_len)
+        hist = self.conn.fetch_ohlcv(request_for, '1d', limit=hist_len)
         hist = list(map(lambda row: row[4], hist))
         return hist
 

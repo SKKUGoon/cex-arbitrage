@@ -61,9 +61,9 @@ class BinanceFutureX(CexManagerX):
             result[f"{t}{key_curruency}".upper()] = ["bookTicker"] 
         return result
 
-    def history(self, ticker: str, key_currency: str, hist_len: int=30) -> List:
+    def history(self, ticker: str, key_currency: str, hist_len: int=20) -> List:
         request_for = f"{ticker.upper()}/{key_currency.upper()}"
-        hist = self.conn.fetch_ohlcv(request_for, '5m', limit=hist_len)
+        hist = self.conn.fetch_ohlcv(request_for, '1d', limit=hist_len)
         # [1668702300000, 16583.03, 16621.95, 16574.67, 16616.88, 1128.21598]
         # [<Unix Time>, <open>, <high>, <low>, <close>, <volume>]
         # Process `hist` data. Get only close data.

@@ -13,7 +13,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-const MINIMUM_BOUND_LENGTH = 0.018
+const MINIMUM_BOUND_LENGTH = 0.04
 
 var SignalMQ SignalMessageQueue
 var ctx = context.Background()
@@ -93,7 +93,7 @@ func comparePremium(p CurrentPremium, upper, lower, flagged map[string]string) (
 		if math.Abs(thresUp-thresLow) < MINIMUM_BOUND_LENGTH {
 			common.PrintBlueStatus(
 				fmt.Sprintf(
-					"| Asset: %-7v | No Profit anticipated             | BandSize: %.3f |",
+					"| Asset: %-7v | No Profit anticipated              | BandSize: %.3f |",
 					p.AssetPremium.Asset, thresUp-thresLow,
 				),
 			)
@@ -102,14 +102,14 @@ func comparePremium(p CurrentPremium, upper, lower, flagged map[string]string) (
 		if flagged[p.AssetPremium.Asset] == "no_enter" {
 			common.PrintRedError(
 				fmt.Sprintf(
-					"| Asset: %-7v |     A S S E T  F L A G G E D      | Chk notice brd  |",
+					"| Asset: %-7v |      A S S E T  F L A G G E D      | Chk notice brd  |",
 					p.AssetPremium.Asset,
 				),
 			)
 		}
 		common.PrintGreenOk(
 			fmt.Sprintf(
-				"| Asset: %-7v | Lower than thres %.4f > %.4f  | BandSize: %.3f |",
+				"| Asset: %-7v | Lower than thres %.4f > %.4f   | BandSize: %.3f |",
 				p.AssetPremium.Asset, thresLow, p.AssetPremium.Premium, thresUp-thresLow,
 			),
 		)
@@ -128,7 +128,7 @@ func comparePremium(p CurrentPremium, upper, lower, flagged map[string]string) (
 		// opening of the position.
 		common.PrintGreenOk(
 			fmt.Sprintf(
-				"| Asset: %-7v | Higher than thres %.4f < %.4f | BandSize: %.3f |",
+				"| Asset: %-7v | Higher than thres %.4f < %.4f  | BandSize: %.3f |",
 				p.AssetPremium.Asset, thresUp, p.AssetPremium.Premium, thresUp-thresLow,
 			),
 		)
@@ -148,7 +148,7 @@ func comparePremium(p CurrentPremium, upper, lower, flagged map[string]string) (
 		)
 		common.PrintBlueStatus(
 			fmt.Sprintf(
-				"| Asset: %-7v | %-33v | Middle No Trade |",
+				"| Asset: %-7v | %-34v | Middle No Trade |",
 				p.AssetPremium.Asset,
 				bInfo,
 			),
