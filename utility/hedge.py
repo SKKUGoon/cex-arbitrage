@@ -60,7 +60,11 @@ class Leverage:
 def hedge_quantity(exchange_wo_lev_q: float, leverage: int) -> float:
     return exchange_wo_lev_q / leverage
 
-def hedge_capital(exchange_wo_lev_m: float, leverage: int, other_exchange_prc: float):
+def hedge_capital(exchange_wo_lev_m: float, other_exchange_prc: float):
+    """
+    No leverage needed. Because order goes in with AMOUNT of the token.
+    This includes the leverage. One just use money 1/lev times.
+    """
     fx, _ = forex()
     other_exchange_m = exchange_wo_lev_m / fx
-    return (other_exchange_m / leverage) / other_exchange_prc
+    return other_exchange_m / other_exchange_prc

@@ -28,12 +28,12 @@ def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, l
         # Access mq_data heap
         mq_data['ps'] = prc
     
-    so_quantity = hedge_capital(lo_money, lev, mq_data['ps'])
+    so_quantity = hedge_capital(lo_money, mq_data['ps'])
 
     p = mq_data["pm"]
     # so_money = balance['s'] * order_ratio
     fx, _ = forex()
-    report_order("enter", asset, lo_money, so_quantity, fx, p)
+    report_order("enter".upper(), asset, lo_money, mq_data['ps'], None, so_quantity, fx, lev, p)
 
     long_ex.conn.create_order(
         f"{asset}/{long_ex.EX_CURRENCY}",
@@ -104,8 +104,9 @@ def iexa_exit_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT) ->
         mq_data["ps"],
         params={"reduceOnly": True}
     )
+    fx, _ = forex()
     p = mq_data["pm"]
-    report_order("exit", asset, lo_quantity, so_quantity, p)
+    report_order("exit".upper(), asset, 0, 0, lo_quantity, so_quantity, fx, 0, p)
     return True
 
 def binance_pos_balance(ex: CexManagerT, tgt: str) -> str:

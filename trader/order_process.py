@@ -1,5 +1,5 @@
 from cex.cex_factory_trade import CexManagerT, CexFactoryT
-from .pair_pos import iexa_check_pos, iexa_enter_pos, iexa_exit_pos
+from .pair_pos import iexa_enter_pos, iexa_exit_pos
 from utility.hedge import Leverage
 from utility.parse_yaml import ConfigParse
 from utility.coloring import PrettyColors
@@ -93,7 +93,6 @@ class ArbitrageIEXA:
         self.pubsub.subscribe(channel_name)
 
         while True:            
-            print('Waiting for trading message')
             res = self.pubsub.get_message(timeout=5)
             if res is not None:
                 if res['type'] == "subscribe":
@@ -129,8 +128,7 @@ class ArbitrageIEXA:
                             PrettyColors().print_ok_blue(val="No trade made")
                             continue
                         self.multi_bal = self._get_balance()
-                        print("Balance updated: long", self.long.balance(self.long.EX_CURRENCY))
-                        print("Balance updated: short", self.short.balance(self.short.EX_CURRENCY))
+                        
                     elif jdata["t"] == "exit":
                         is_exec = iexa_exit_pos(
                             mq_data=jdata,
@@ -142,8 +140,7 @@ class ArbitrageIEXA:
                             PrettyColors().print_ok_blue(val="No trade made")
                             continue
                         self.multi_bal = self._get_balance()
-                        print("Balance updated: long", self.long.balance(self.long.EX_CURRENCY))
-                        print("Balance updated: short", self.short.balance(self.short.EX_CURRENCY))
+                        
                     else:
                         print(PrettyColors.FAIL + "wrong message" + PrettyColors.ENDC)
 
