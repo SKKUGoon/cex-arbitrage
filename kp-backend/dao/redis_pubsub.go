@@ -122,7 +122,7 @@ func comparePremium(p CurrentPremium, upper, lower, flagged map[string]string) (
 		pos.RptPremium = p.AssetPremium.Premium
 
 	// Exit position
-	case p.AssetPremium.Premium > thresUp:
+	case p.AssetPremium.Premium > (thresUp * 3 / 5):
 		// Exit signal should be made regardless of band size.
 		// since the band size might have been reduced after the
 		// opening of the position.
