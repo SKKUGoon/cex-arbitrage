@@ -220,3 +220,19 @@ Two bugs were discovered during 2 days of test run. 1) Not entering position wit
       - Process Websocket is assigned in process 1 and process 2 multiprocess. They are set as daemon process, so that sys.exit() will forcefully close them.
       - Process 3 was originally inside multiprocess, but it's now taken out. 
       - Restarting is done by setting up docker compose file accordingly. ( [7028f00]() )
+
+## v0.8.4
+
+### Main features
+- Trading parameters fixed ( [d407dcd]() )
+  - It's recession. Take smaller aim
+  - TODO: make it an environment variable based on trading market's behavior
+
+### Bugs and fixes
+- Fix Trader ( [e222d16]() )
+  - Fix reporting system
+  - Hedge implementation of binance exchange was wrong
+    - Before: If you want to buy 100 token that costs 1$ with leverage 2
+      - I wrote 50, Thinking 50 * 2 = 100
+    - It should be just 100. Leverage makes you use less money. 
+  - Clean print system
