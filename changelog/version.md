@@ -243,6 +243,10 @@ Two bugs were discovered during 2 days of test run. 1) Not entering position wit
 - Fix leverage process. ( [94781a6]() )
   - After trade recalculate leverage base on the free-money. 
   - If the leverage goes over the designated Maximum leverage - Stop trading. Just sell
+- Fix default leverage to 2 ( ~~[63758c5]()~~, [f5cef2a]() )
+  - Increase profitability
+
 - Fix band calculation period. from 12 hours -> 1 hour. ( [db547e4]() )
   - Due to fluctuations in forex market. 
+
   
