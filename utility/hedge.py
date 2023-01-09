@@ -37,18 +37,12 @@ class Leverage:
                 self.wallets[fix_lev_rate_one] * wallet1_usage, 
                 self.wallets["wallet2"] * wallet2_usage
             )
-            if lev[1] == 1:
-                # Base leverage setting as 2
-                return {"wallet1": lev[0], "wallet2": 2}
             return {"wallet1": lev[0], "wallet2": lev[1]}
         else:
             lev = self._calc_leverage(
                 self.wallets[fix_lev_rate_one] * wallet2_usage, 
                 self.wallets["wallet1"] * wallet1_usage
             )
-            if lev[1] == 1:
-                # Base leverage setting as 2
-                return {"wallet2": lev[0], "wallet1": 2}
             return {"wallet2": lev[0], "wallet1": lev[1]}
         
     
@@ -58,8 +52,15 @@ class Leverage:
             return 0, 0
 
         if w_standard <= w_compare:
-            return 1, 1
+            # Should be 1, 1
+            # But Set base leverage as 2
+            return 1, 2
         else:
+            if w_standard // w_compare == 1:
+                # Should be 1, 1
+                # But Set base leverage as 2
+                return 1, 2
+            
             return 1, w_standard // w_compare
                 
 
