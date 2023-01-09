@@ -30,7 +30,11 @@ class ArbitrageIEXA:
 
         # Trade information
         self.multi_bal = self._get_balance()
-        self.day_leverage = self.set_leverage(long_total_use, short_total_use)
+        self.long_total_use, self.short_total_use = long_total_use, short_total_use
+        self.day_leverage, self.day_leverage_warn = self.set_leverage(
+            self.long_total_use, 
+            self.short_total_use
+        )
 
         r = redis.Redis(host=hostname, port=6379, db=0, password="mypassword")
         self.pubsub = r.pubsub()
@@ -49,7 +53,7 @@ class ArbitrageIEXA:
             "fx": fx
         }
 
-    def set_leverage(self, ex_long_usage: float, ex_short_usage: float) -> int:
+    def set_leverage(self, ex_long_usage: float, ex_short_usage: float) -> tuple:
         """
         Read balance from `self.multi_bal` and return leverage rate in integer. 
         If leverage is 1) not within bounds of test.py it issues a warning. 
@@ -57,6 +61,8 @@ class ArbitrageIEXA:
 
         `STANDARD` wallet is "wallet1". In this case `STANDARD` wallet is Upbit.
         (Because Upbit doesn't offer any leverage service.)
+
+        Return leverage and leverage warning
         """
         # Get PRESET max-min leverage
         cp = ConfigParse("./exchange.yaml")
@@ -74,10 +80,14 @@ class ArbitrageIEXA:
             raise RuntimeError(f"leverage should be greater than 0. {app_lev[COMPARISON]} <= 0")
         try:
             assert lev_min <= app_lev[COMPARISON] <= lev_max
+            lev_warning = False
         except AssertionError:
             warnings.warn(f"Warning. Leverage out of bound {app_lev[COMPARISON]}~[{lev_min}, {lev_max}]")
-        
-        return app_lev[COMPARISON]
+            lev_warning = True
+        PrettyColors().print_ok_green(
+            f"New Leverage Set to {app_lev[COMPARISON]}. Warning? {lev_warning}"
+        )
+        return app_lev[COMPARISON], lev_warning
 
     def listen(self, channel_name: str):
         """
@@ -115,6 +125,9 @@ class ArbitrageIEXA:
                         continue
 
                     if jdata["t"] == "enter":
+                        if self.day_leverage_warn:
+                            PrettyColors().print_fail(val="High leverage no enter")
+                            continue
                         is_exec = iexa_enter_pos(
                             mq_data=jdata,
                             lev=self.day_leverage,
@@ -127,7 +140,12 @@ class ArbitrageIEXA:
                             # Stop calling binance asset when no trade is made
                             PrettyColors().print_ok_blue(val="No trade made")
                             continue
+                        # Update balance and leverage 
                         self.multi_bal = self._get_balance()
+                        self.day_leverage, self.day_leverage_warn = self.set_leverage(
+                            self.long_total_use, 
+                            self.short_total_use
+                        )
                         
                     elif jdata["t"] == "exit":
                         is_exec = iexa_exit_pos(
@@ -140,7 +158,10 @@ class ArbitrageIEXA:
                             PrettyColors().print_ok_blue(val="No trade made")
                             continue
                         self.multi_bal = self._get_balance()
-                        
+                        self.day_leverage, self.day_leverage_warn = self.set_leverage(
+                            self.long_total_use, 
+                            self.short_total_use
+                        )                        
                     else:
                         print(PrettyColors.FAIL + "wrong message" + PrettyColors.ENDC)
 

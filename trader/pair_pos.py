@@ -34,26 +34,31 @@ def iexa_enter_pos(mq_data: dict, lev: int, balance: dict, order_ratio: float, l
     # so_money = balance['s'] * order_ratio
     fx, _ = forex()
     report_order("enter".upper(), asset, lo_money, mq_data['ps'], None, so_quantity, fx, lev, p)
-
-    long_ex.conn.create_order(
-        f"{asset}/{long_ex.EX_CURRENCY}",
-        "market",
-        "buy",
-        lo_quantity,
-        1,  # lo_quantity * 1 = Total money ordering on upbit. 
-    )
-    # Adjust leverage for IEXA arb
-    short_ex.conn.fapiPrivate_post_leverage({
-        "symbol": f"{asset}{short_ex.EX_CURRENCY}".upper(),
-        "leverage": int(lev),
-    })
-    short_ex.conn.create_order(
-        f"{asset}/{short_ex.EX_CURRENCY}",
-        "market",
-        "sell",
-        so_quantity,
-        mq_data["ps"],  # Here the price is ignored. 
-    )
+    try:
+        long_ex.conn.create_order(
+            f"{asset}/{long_ex.EX_CURRENCY}",
+            "market",
+            "buy",
+            lo_quantity,
+            1,  # lo_quantity * 1 = Total money ordering on upbit. 
+        )
+        # Adjust leverage for IEXA arb
+        short_ex.conn.fapiPrivate_post_leverage({
+            "symbol": f"{asset}{short_ex.EX_CURRENCY}".upper(),
+            "leverage": int(lev),
+        })
+        short_ex.conn.create_order(
+            f"{asset}/{short_ex.EX_CURRENCY}",
+            "market",
+            "sell",
+            so_quantity,
+            mq_data["ps"],  # Here the price is ignored. 
+        )
+    except Exception as e:
+        # Handle insufficient fund. 
+        print(e)
+        PrettyColors().print_fail(f"Failed trade. Insufficient fund, l qty {lo_quantity}, s qty {so_quantity}")
+        return False
     return True
 
 def iexa_check_pos(mq_data: dict, long_ex: CexManagerT, short_ex: CexManagerT) -> bool:
