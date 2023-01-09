@@ -47,5 +47,8 @@ if __name__ == "__main__":
     PrettyColors().print_warning(
         val=f"Band Updated. {time.strftime('%c', time.localtime())}"
     )
-    # Wait for 5 minute. After 5 minute, container restart.
-    time.sleep(60 * 5 - (job_done - job_start))  # 60sec * 5 = 5 minutes
+    # # Wait for 5 minute. After 5 minute, container restart.
+    # time.sleep(60 * 5 - (job_done - job_start))  # 60sec * 5 = 5 minutes
+    # Wait for 1 hours till container restart - due to forex changes
+    time.sleep(60 * 60 * 1 - (job_done - job_start))  # 60sec * 5 = 5 minutes
+    
