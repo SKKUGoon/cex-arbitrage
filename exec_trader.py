@@ -33,5 +33,5 @@ if __name__ == "__main__":
         short_total_use=binance_ir,
         hostname=args.hostname
     )
-    arbitrager.listen("trade_channel", None, None)
+    arbitrager.listen("trade_channel")
   

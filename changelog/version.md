@@ -97,11 +97,156 @@ Add the features related to trading IEXA strategies.
 
 ## v0.7.1
 
-## Main features
+### Main features
 Version v0.7.1 contains fixes after running field test1. Field test1 is conducted on December 21st, on POP-OS Linux machine. 
 
 - Changes in docker compose file. ( [2855183]() )
 
-## Bugs and Fixes
+### Bugs and Fixes
 - Not trading Buy-sell pair, but was instead doing Buy-Buy. ( [e0a3c4d]() [b7f0b4d]() )
 - Check balance again ( [5917d7b]() )
+
+
+## v0.7.2
+
+### Main features
+
+Two bugs were discovered during 2 days of test run. 1) Not entering position with sell-buy but entering position in buy-buy. 2) Not able to detect already bought object. 1) is fixed in v0.7.1. Websocket problem is not python specific, but more efficient error-proof websocket module is being developed in branch `upgrade/wss`.
+
+- 2) is fixed. Binance open_position_set needed keycurrency. For example, upbit has "WAVES" but in binance has "WAVESBUSD" ( [12de847]() )
+
+### Bugs and Fixes
+- `get_balance` after trading had missing variable input. Fixed. ( [412e74c]() )
+
+
+## v0.7.3
+
+### Main features
+- Change websocket from spot stream to future stream ( [584f21d]() )
+- Anticipate slippeage rate. Resize band width threshold from 0.015 to 0.02 ( [babaa34]() )
+
+### Bugs and Fixes
+- Fix `iexa_exit_pos`, by adding `abs()` to the quantity of the function. ( [a49e969]() )
+  - Short position in binance will give you negative quantity(<0) value. 
+  - When giving out market orders it should be ordering positive value.
+
+## v0.8
+
+### Main features
+- Prep backend for new new strategy. ( [cb4762a]() )
+  - Open a new message channel `notice_channel`
+    - message example: `{"type": "notice", "status": true, "data": {"asset": "SOL", "complete": false}}`
+  - Create structure for `notice_channel` message input. `Signal[BlockNotice]`
+  - Add channel `NoticeMessage` in `SignalMessageQueue`
+  - Organize goroutines
+    - `mqToSigChan`: message queue signal_channel -> goroutine data channel
+    - `mqToNotChan`: message queue notice_channel -> goroutine data channel
+- New strategy - Notice Enclosed Premium ( [8e60c1a]() )
+  - The premium on one exchange will rise, if there is not much coin influx. Take the premium by going long on the enclosed exchange, and hedging the position on the other exchange.
+  - Crawler with python script. Dockerfile + Docker compose config file. Restart container every 1 minute. ( [27113a7]() )
+  - If the message is old, (more then `RECENT_STANDARD` minute) it does not send any message to `notice_channel`. ( [412207b]() )
+
+### Sub features
+- Code refactoring
+  - Create print_color functions ( [9733b45]() )
+- `order_process.py`: add trade executed bool for `iexa_enter_pos` function and `iexa_exit_pos` function. If the return boolean is <b>False</b>, it does not update the balance - since no trade was made. Else if the return boolean is <b>True</b>, it updates the balance like before. This reduces calls to Binance and Upbit by not calling binance and upbit api everytime no-trade message is sent. ( [a79c691]() )  
+
+### Bugs and Fixes
+- Before: If signal in the message channel was malformed, it will emit msg to `trade_channel` regardless, which could lead to error in the trading module. But Now: if the signal message is malformed, it emits warning message in purple and continues loop. ( [cb4762a]() )
+- Before: Position Exit signal could not be made if the band size shrink. But Now: Position Exit signal can be emitted regardless of the band size. ( [cb4762a]() )
+- Before: no rules for printing colors in backend. But now: rules. ( [15ad222]() )
+  - Backend ( [cb4762a]() )
+    - Green Print : OK sign
+    - Blue Print : Trade fail sign.
+    - Cyan Print : Deploy environment status
+    - Yellow Print : Any sort of operation. 
+    - Purple Print : Warning or error. Not severe. Definitely not stopping to program.  
+  - Python Scripts ( [ce5850f]() )
+    - Bold Print : Reporting purpose
+    - Underline Print : Infinite Loop Run start
+    - Header Pring (Purple) : All CexManagerX, CexManagerT Function Order.
+    - Green Print : OK sign
+    - Blue Print : OK sign. But Not leading to trade. 
+    - Cyan Print : OK sign - on Not Exchange Modules. (Signals)
+    - Warning Print (Orange) : Unfavorable condition. But Continue. 
+    - Fail Print (Red) : Outright Fail!ess)
+- Delete password print in `CacheNewConn`. ( [cb4762a]() )
+- Add `config_dev.yaml` in local storage (git ignored).
+- Reduce `MINIMUM_BOUND_LENGTH` from 0.02 to 0.018. ( [cb4762a]() )
+
+## v0.8.1
+
+### Main features
+- Add new field to Redis key-value database. ( [45b87af]() )
+  - `beware` field: `asset`: `"no_enter"`
+    - <b>ADDED</b>
+      - `!p.Data.Complete` in `redis_pubsub.go` line 192
+    - <b>DELETE</b> 
+      - `p.Data.Complete` in `redis_pubsub.go` line 202
+
+### Bugs and Fixes
+- Delete unused directory `./kp-backend/ent` ( [e636339]() )
+- Organize backend printed value. Now it looks like this. ( [e636339]() )
+```console
+2022/12/28 14:53:32  [| Asset: LINK    | Higher than thres 0.0058 < 0.0101 | BandSize: 0.004 |] 
+2022/12/28 14:53:32  [| Asset: SAND    | Higher than thres 0.0057 < 0.0114 | BandSize: 0.004 |] 
+```
+- Add release mode according to environement. ( [e636339]() )
+- Flagged Asset on notice. Bug in the handler. Logic update( [bc77150]() )
+
+
+## v0.8.2
+
+### Main features
+- Tweak strategy. ( [b0d4156]() )
+  - Adjust band generation data. from `5m` to `1d`. From `30` length to `20` length.
+  - Band length to 4%point. 
+  - Currently premium is at all time low (2022/12/30). Strategy change needed
+- Change the hedging method. ( [d47d2ae]() )
+  - From token quantity hedging to total spent capital hedging.
+- Notice_channel -> trade_channel gives no input about price of the exchange. It gives you as value of `-1`. Normal ordering method will return error. ( [62cdc0a]() )
+  - Upbit: Needs 1. quantity 2. price even if you are ordering through `market` price. They access `quantity * price` and buys for just that amount. 
+  - Binance, if you order by `market`, `price` doesn't matter. 
+  - For notice origin trading message, you must supply them with market price in order to hedge properly. 
+
+
+## v0.8.3
+
+### Main features
+- Fix websocket app.
+  - Make websocket app crash and restart on certain condition
+    - When Binance App or upbit app automatically closes websocket connection, crash the container, and then restart. ( [dc0b86f]() )
+      - Crashing is done by, setting `long_noval`, `short_noval` value. And at every iteration, if the websocket does not contain the asset's price value, add 1 respectively. If the `long_noval` or `short_noval` is equal to total number of asset, - which is highly unlikely since there are more than 20 assets, the app crashes.
+      - Process Websocket is assigned in process 1 and process 2 multiprocess. They are set as daemon process, so that sys.exit() will forcefully close them.
+      - Process 3 was originally inside multiprocess, but it's now taken out. 
+      - Restarting is done by setting up docker compose file accordingly. ( [7028f00]() )
+
+## v0.8.4
+
+### Main features
+- Trading parameters fixed ( [d407dcd]() )
+  - It's recession. Take smaller aim
+  - TODO: make it an environment variable based on trading market's behavior
+
+### Bugs and fixes
+- Fix Trader ( [e222d16]() )
+  - Fix reporting system
+  - Hedge implementation of binance exchange was wrong
+    - Before: If you want to buy 100 token that costs 1$ with leverage 2
+      - I wrote 50, Thinking 50 * 2 = 100
+    - It should be just 100. Leverage makes you use less money. 
+  - Clean print system
+
+## v0.8.5
+
+### Main features
+- Fix leverage process. ( [94781a6]() )
+  - After trade recalculate leverage base on the free-money. 
+  - If the leverage goes over the designated Maximum leverage - Stop trading. Just sell
+- Fix default leverage to 2 ( ~~[63758c5]()~~, [f5cef2a]() )
+  - Increase profitability
+
+- Fix band calculation period. from 12 hours -> 1 hour. ( [db547e4]() )
+  - Due to fluctuations in forex market. 
+
+  

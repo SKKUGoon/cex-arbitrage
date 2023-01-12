@@ -3,7 +3,6 @@ package api
 import (
 	"kimchi/common"
 	"kimchi/dao"
-	"kimchi/ent"
 	"log"
 	"net/http"
 	"os"
@@ -20,7 +19,6 @@ import (
 
 type InternalServer struct {
 	Conn          *gin.Engine
-	LtDataBase    *ent.Client // Not yet operational
 	CacheDataBase *redis.Client
 }
 
@@ -36,7 +34,10 @@ type Webserver struct {
 //  3. Connect to Redis database
 //  4. TODO: connect to MySQL Database
 //  5. TODO: connect to Telegram Service
-func New(redisConfig string) InternalServer {
+func New(redisConfig string, env string) InternalServer {
+	if env == "deploy" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	conn := gin.Default()
 	conn.Use(common.CORSMiddleware())
 	common.PrintGreenOk("Create gin engine. Attach middleware")
@@ -87,7 +88,7 @@ func (client InternalServer) Serve(configFile string, configEnv string) *http.Se
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	common.PrintBlueStatus("deploying on ", src.Addr)
+	common.PrintCyanStatus("deploying on ", src.Addr)
 	return src
 }
 

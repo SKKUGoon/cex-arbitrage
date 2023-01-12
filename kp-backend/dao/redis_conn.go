@@ -21,9 +21,7 @@ func CacheNewConn(configFile string) *redis.Client {
 	if err != nil {
 		log.Panicln("Redis conn config file parse error:", err)
 	}
-
-	common.PrintBlueStatus(redisInfo["redis"].Conn.Host + ":" + redisInfo["redis"].Conn.Port)
-	common.PrintBlueStatus(redisInfo["redis"].Login.Password)
+	common.PrintCyanStatus(redisInfo["redis"].Conn.Host + ":" + redisInfo["redis"].Conn.Port)
 	client := redis.NewClient(&redis.Options{
 		Addr:     redisInfo["redis"].Conn.Host + ":" + redisInfo["redis"].Conn.Port,
 		Password: redisInfo["redis"].Login.Password,

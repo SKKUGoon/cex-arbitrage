@@ -45,6 +45,8 @@ services:
     depends_on:
       trade_control:
         condition: service_healthy
+    restart: unless-stopped
+    
 
   premium_trade:
     build:
@@ -56,5 +58,16 @@ services:
       trade_control:
         condition: service_healthy
 
+  premium_notice:
+    build:
+      context: .
+      dockerfile: ./docker/premium_notice/Dockerfile
+    ports:
+      - "8084:8084"
+    depends_on:
+      trade_control:
+        condition: service_healthy
+    restart: unless-stopped
+    
 volumes:
   redis_data:

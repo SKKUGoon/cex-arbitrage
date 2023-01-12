@@ -4,6 +4,8 @@ from utility.coloring import PrettyColors
 
 import multiprocessing as mp
 from typing import Set, Callable
+import sys
+import time
 
 
 class StrategyIEXA:
@@ -28,7 +30,7 @@ class StrategyIEXA:
         Find common assets pairs between exchange_long and exchange_short.
         Returns common currency in set
         """
-        print(PrettyColors.OKBLUE + "Update common traded asset" + PrettyColors.ENDC)
+        PrettyColors().print_ok_cyan("Update common traded asset")
         l = self.exchange.get_tradable(self.longX)[long_key_currency.upper()]
         s = self.exchange.get_tradable(self.shortX)[short_key_currency.upper()]
         
@@ -63,8 +65,9 @@ class StrategyIEXA:
         for asset in assets:
             multiq_long[asset]: mp.Queue = mp.Queue()
             multiq_short[asset]: mp.Queue = mp.Queue()
-        print(PrettyColors.OKBLUE + f"Created {len(assets)}# queues" + PrettyColors.ENDC)
+        PrettyColors().print_ok_cyan(f"Created {len(assets)}# queues")
         
+        # Set up websocket workers
         p1 = mp.Process(
           target=ws_func_long, 
           args=(x_long, multiq_long, ws_keycurr_long,))
@@ -72,15 +75,17 @@ class StrategyIEXA:
           target=ws_func_short, 
           args=(x_short, multiq_short, ws_keycurr_short,)
         )
-        p3 = mp.Process(
-          target=gen_signal_iexa_multi, 
-          args=(assets, multiq_long, multiq_short, hostname, env,)
-        )
+
+        # Set up as daemon process
+        p1.daemon = True
+        p2.daemon = True
+        PrettyColors().print_ok_cyan(f"Created p1, p2. Both as Daemon")
 
         p1.start()
         p2.start()
-        p3.start()
 
-        p1.join()
-        p2.join()
-        p3.join()  # Wait for completion
+        gen_signal_iexa_multi(assets, multiq_long, multiq_short, hostname, env)
+        PrettyColors().print_ok_green("System exit after 5 sec. Daemon Process terminated")
+        time.sleep(5)
+        sys.exit()
+        return

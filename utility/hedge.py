@@ -1,5 +1,5 @@
-from .coloring import PrettyColors
 from typing import Dict
+from .fx import forex
 
 
 class Leverage:
@@ -52,10 +52,26 @@ class Leverage:
             return 0, 0
 
         if w_standard <= w_compare:
-            return 1, 1
+            # Should be 1, 1
+            # But Set base leverage as 2
+            return 1, 2
         else:
+            if w_standard // w_compare == 1:
+                # Should be 1, 1
+                # But Set base leverage as 2
+                return 1, 2
+            
             return 1, w_standard // w_compare
                 
 
-def hedge(exchange_wo_lev_q: float, leverage: int):
+def hedge_quantity(exchange_wo_lev_q: float, leverage: int) -> float:
     return exchange_wo_lev_q / leverage
+
+def hedge_capital(exchange_wo_lev_m: float, other_exchange_prc: float):
+    """
+    No leverage needed. Because order goes in with AMOUNT of the token.
+    This includes the leverage. One just use money 1/lev times.
+    """
+    fx, _ = forex()
+    other_exchange_m = exchange_wo_lev_m / fx
+    return other_exchange_m / other_exchange_prc

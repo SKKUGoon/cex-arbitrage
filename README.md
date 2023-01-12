@@ -1,7 +1,7 @@
 # Centralized Exchange (CEX) Arbitrage
 
 ## 1. Arbitrage container scheme.
-![alt text](./public/Cex-Arb_Diagram.drawio.png)
+![alt text](./public/Cex-Arb_Diagram_v0.8%2B%2B.jpg)
 
 Each of the title suggest the name of the container that's already written in `docker-compose.yaml` file, with its respective internal access ports. <b>Redis</b> database works as message queue handler that connects trade_control webserver(written with <b>Go</b>) and other premium containers. 
 
@@ -15,7 +15,26 @@ Docker compose file is online. (<b>Require at least docker-compose version 2</b>
 
 If one should change the key currency trading pair, look inside `./docker` and edit each `Dockerfile` for their respective containers. 
 
-## 3. File Scheme
+## 3. Status 
+
+Backend
+- Green Print : OK sign
+- Blue Print : Trade fail sign.
+- Cyan Print : Deploy environment status.
+- Yellow Print : Any sort of operation. 
+- Purple Print : Warning or error. Not severe. Definitely not stopping to program. 
+
+Python
+- Bold Print : Reporting purpose
+- Underline Print : Infinite Loop Run start
+- Header Pring (Purple) : All CexManagerX, CexManagerT Function Order.
+- Green Print : OK sign
+- Blue Print : OK sign. But Not leading to trade. 
+- Cyan Print : OK sign - on Not Exchange Modules. (Signals)
+- Warning Print (Orange) : Unfavorable condition. But Continue. 
+- Fail Print (Red) : Outright Fail!
+
+## 4. File Scheme
 <details>
 <summary>File Tree</summary>
 

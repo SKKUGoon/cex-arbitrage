@@ -11,4 +11,5 @@ class ConfigParse:
                 data = yaml.safe_load(file)
                 return data
             except yaml.YAMLError as exc:
-                print(PrettyColors.FAIL + exc + PrettyColors.ENDC)
+                PrettyColors().print_fail(exc)
+

@@ -17,12 +17,7 @@ class BinanceX(CexManagerX):
 
     def parse_yaml(self) -> Dict:
         # Create self.config
-        print(
-            PrettyColors.HEADER 
-            + "Binance Config file" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("ESSENTIAL: Binance Spot Config file")
         cp = ConfigParse("./exchange.yaml")
         d = cp.parse()
         return {
@@ -32,12 +27,7 @@ class BinanceX(CexManagerX):
 
     def connection(self):
         # Create self.conn
-        print(
-            PrettyColors.HEADER 
-            + "Binance Connection" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("ESSENTIAL: Binance Connection")
         conn = ccxt.binance(config=self.config)
         return conn
 
@@ -56,12 +46,7 @@ class BinanceX(CexManagerX):
 
     def tradable(self) -> Dict:
         # Create self.curr
-        print(
-            PrettyColors.OKCYAN 
-            + "Binance Tradables Update" 
-            + PrettyColors.ENDC,
-            flush=True
-        )
+        PrettyColors().print_status_purple("Binance Tradables Update")
         curr = self.conn.load_markets()
         key_curr_pair = self._key_currency(curr)
         return key_curr_pair
@@ -72,9 +57,9 @@ class BinanceX(CexManagerX):
             result[f"{t}{key_curruency}".upper()] = ["bookTicker"] 
         return result
 
-    def history(self, ticker: str, key_currency: str, hist_len: int=30) -> List:
+    def history(self, ticker: str, key_currency: str, hist_len: int=20) -> List:
         request_for = f"{ticker.upper()}/{key_currency.upper()}"
-        hist = self.conn.fetch_ohlcv(request_for, '5m', limit=hist_len)
+        hist = self.conn.fetch_ohlcv(request_for, '1d', limit=hist_len)
         # [1668702300000, 16583.03, 16621.95, 16574.67, 16616.88, 1128.21598]
         # [<Unix Time>, <open>, <high>, <low>, <close>, <volume>]
         # Process `hist` data.
